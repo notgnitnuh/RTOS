@@ -3,7 +3,7 @@
 
 
 
-// uart is driven by the system clock
+// uart is driven by the system clock, 16550 UART
 #define UART_clkin 50000000
 
 

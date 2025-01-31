@@ -5,8 +5,6 @@
 #include <uart.h>
 
 
-// uart is driven by the system clock
-#define UART_clkin 50000000
 void uart_init(int baud_rate)
 {
   int divisor = UART_clkin / (baud_rate << 4);
