@@ -86,6 +86,8 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3
+  ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
+  ${CMAKE_SOURCE_DIR}/CMSIS/CMSIS/Core/Include
 )
 
 # list of FreeRTOS sources that we need
@@ -103,6 +105,7 @@ file(GLOB FREERTOS_SOURCES
 file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/main.c"
   "${CMAKE_SOURCE_DIR}/src/uart.c"
+  "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"
 )
 
