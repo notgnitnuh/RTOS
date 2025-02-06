@@ -1,43 +1,25 @@
-
-#include <FreeRTOS.h>
+#include <hello_task.h>
+#include <stats_task.h>
 #include <task.h>
 #include <uart.h>
 
 // "screen /dev/ttyUSB1 9600"
 
-void hello_task(void *pvParameters)
-{
-  while(1)
-    {
-      uart_write_string("Hello World\n\r");
-      vTaskDelay(pdMS_TO_TICKS( 1000 ));
-    }
-}
-
-/* Dimensions the buffer that the task being created will use as its
-stack. NOTE: This is the number of words the stack will hold, not the
-number of bytes. For example, if each stack item is 32-bits, and this
-is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
-#define STACK_SIZE 256
-
-/* Structure that will hold the TCB of the task being created. */
-StaticTask_t hello_TCB;
-
-/* Buffer that the task being created will use as its stack. Note this
-is an array of StackType_t variables. The size of StackType_t is
-dependent on the RTOS port. */
-StackType_t hello_stack[ STACK_SIZE ];
-
 int main( void )
 {
   TaskHandle_t hello_handle = NULL;
+  TaskHandle_t stats_handle = NULL;
 
   // configure the uart for 9600/N/8/2
   uart_init(9600);
   
   /* Create the task without using any dynamic memory allocation. */
-  hello_handle = xTaskCreateStatic(hello_task,"hello",STACK_SIZE,
+  hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
 				   NULL,2,hello_stack,&hello_TCB);
+  
+
+  stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
+				   NULL,1,stats_stack,&stats_TCB);
 			      
   /* start the scheduler */
   vTaskStartScheduler();

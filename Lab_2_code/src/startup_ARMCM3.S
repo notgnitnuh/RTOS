@@ -198,6 +198,10 @@ Default_Handler:
 	provide_DUMMY _lseek
 	provide_DUMMY _read
 	provide_DUMMY _write
+        provide_DUMMY _fstat
+        provide_DUMMY _fstat_r
+        provide_DUMMY _isatty
+        provide_DUMMY _isatty_r
 
         
 	
