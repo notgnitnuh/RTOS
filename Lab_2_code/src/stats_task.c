@@ -41,9 +41,9 @@ void setup_stats_timer(void)
 {
   timer_number = AXI_TIMER_allocate();
   AXI_TIMER_set_handler(timer_number, timer_interrupt_handler);
-  AXI_TIMER_set_repeating(timer_number, AXI_TIMER_HZ_TO_COUNT);
+  AXI_TIMER_set_repeating(timer_number, AXI_TIMER_HZ_TO_COUNT(10000));
   AXI_TIMER_enable_interrupt(timer_number);
-  AXI_TIMER_enable(timer_number);
+  // AXI_TIMER_enable(timer_number);
   // also enable interrupt in the NVIC using CMSIS
 
 }

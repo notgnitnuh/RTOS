@@ -16,9 +16,9 @@
 // __NVIC_PRIO_BITS will be specified when CMSIS is being used. BUT
 //  ONLY IF YOU INCLUDE THE CMSIS HEADER PREVIOUSLY
 #ifdef __NVIC_PRIO_BITS
-	#define configPRIO_BITS	          __NVIC_PRIO_BITS
+  #define configPRIO_BITS	                         __NVIC_PRIO_BITS
 #else
-	#define configPRIO_BITS				 3
+  #define configPRIO_BITS				 3
 #endif
 
 #define configENABLE_TRUSTZONE  0
@@ -92,14 +92,19 @@
 #define configUSE_TICK_HOOK                              0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK               0
 
-#define configASSERT_DEFINED                             1
-extern void vAssertCalled( void );
-#define configASSERT( x )    if( ( x ) == 0 ) vAssertCalled()
-#define ASSERT( x )    if( ( x ) == 0 ) vAssertCalled()
-// #define configASSERT( x ) // use this line to be more effecient
 
-#define configUSE_MUTEXES                         0
-#define configUSE_RECURSIVE_MUTEXES               0
+void vAssertCalled( unsigned line, const char * const filename );
+//#define configASSERT_DEFINED                             1
+//#define configASSERT( x )    if( ( x ) == 0 ) vAssertCalled()
+
+/* Define to trap certain errors in application code during development. */
+#define ASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __LINE__, __FILE__);
+// #define ASSERT( x )
+
+
+
+#define configUSE_MUTEXES                         1
+#define configUSE_RECURSIVE_MUTEXES               1
 #define configUSE_TIMERS                          0
 #define configTIMER_TASK_STACK_DEPTH              (256)
 

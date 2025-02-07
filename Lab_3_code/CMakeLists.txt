@@ -44,7 +44,7 @@ add_custom_target(extra-clean
 # out FreeRTOS and CMSIS
 add_custom_target(tarfile
   COMMAND make extra-clean
-  COMMAND pushd ..\; tar --exclude='CMakeCache.txt' --exclude='CMakeFiles/*' --exclude='CMSIS/*' --exclude='FreeRTOS/*' --exclude='CMSIS' --exclude='FreeRTOS' --exclude='Makefile' -czf ${DirName}.tgz ${DirName}\; popd
+  COMMAND cd ..\; tar --exclude='CMakeCache.txt' --exclude='CMakeFiles/*' --exclude='CMSIS/*' --exclude='FreeRTOS/*' --exclude='CMSIS' --exclude='FreeRTOS' --exclude='Makefile' -czf ${DirName}.tgz ${DirName}
   COMMENT Make realclean, then create a tgz file in the parent directory
   )
 
@@ -86,15 +86,17 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3
-  ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
   ${CMAKE_SOURCE_DIR}/CMSIS/CMSIS/Core/Include
+  ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
 )
 
 # list of FreeRTOS sources that we need
 file(GLOB FREERTOS_SOURCES
    "${CMAKE_SOURCE_DIR}/FreeRTOS/tasks.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/list.c"
-#   "${CMAKE_SOURCE_DIR}/FreeRTOS/queue.c"
+   "${CMAKE_SOURCE_DIR}/FreeRTOS/queue.c"
+   "${CMAKE_SOURCE_DIR}/FreeRTOS/mutex.c"
+   "${CMAKE_SOURCE_DIR}/FreeRTOS/stream_buffer.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3/port.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/MemMang/heap_3.c"
 # add more as needed
@@ -104,10 +106,10 @@ file(GLOB FREERTOS_SOURCES
 # Sources for the executable
 file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/main.c"
-  "${CMAKE_SOURCE_DIR}/src/uart.c"
   "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/stats_task.c"
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
+  "${CMAKE_SOURCE_DIR}/src/UART_16550.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"
 )
 
@@ -116,7 +118,7 @@ set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/src/gcc_arm.ld)
 
 # Additional options for the GNU linker
 add_link_options(-Wl,-gc-sections,--print-memory-usage)
-#  add_link_options(-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
+add_link_options(-Wl,-Map=bin/${PROJECT_NAME}.map)
 add_link_options(-mcpu=${MCPU} -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT} --specs=nosys.specs -nostartfiles)
 
@@ -127,17 +129,18 @@ add_executable(${PROJECT_NAME}.elf ${SOURCES} ${FREERTOS_SOURCES} ${LINKER_SCRIP
 set(ELF_FILE ${PROJECT_NAME}.elf)
 set(HEX_FILE ${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_NAME}.bin)
+set(MAP_FILE ${PROJECT_NAME}.map)
 
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Oihex bin/${ELF_FILE} bin/${HEX_FILE}
         COMMAND ${CMAKE_OBJCOPY} -Obinary bin/${ELF_FILE} bin/${BIN_FILE}
+        COMMAND scripts/report_sections.sh ${CMAKE_SOURCE_DIR}/bin/${MAP_FILE}
         COMMENT "Building ${HEX_FILE} Building ${BIN_FILE}")
-      
+
 set_property(
   TARGET ${PROJECT_NAME}.elf
   APPEND
-  PROPERTY ADDITIONAL_CLEAN_FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map ${HEX_FILE} ${BIN_FILE}
-  )
+  PROPERTY ADDITIONAL_CLEAN_FILES "${CMAKE_SOURCE_DIR}/bin/${HEX_FILE};${CMAKE_SOURCE_DIR}/bin/${BIN_FILE};${CMAKE_SOURCE_DIR}/bin/${MAP_FILE}")
 
 
 set(CMAKE_SKIP_INSTALL_RULES True)
