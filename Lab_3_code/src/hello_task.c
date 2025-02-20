@@ -1,5 +1,3 @@
-
-
 #include <hello_task.h>
 #include <task.h>
 #include <UART_16550.h>
@@ -13,12 +11,12 @@ void hello_task(void *pvParameters)
   uint32_t ticks,last_tick=0,time,min_time=1<<31,max_time=0,max_jitter=0,loop_times=0;
   const TickType_t period = pdMS_TO_TICKS(100);
   
-  // TickType_t lastwake = xTaskGetTickCount();
+  TickType_t lastwake = xTaskGetTickCount();
   while(1)
     {
       // wait until the timeout
-      // vTaskDelayUntil(&lastwake,period);
-      vTaskDelay(period);
+      vTaskDelayUntil(&lastwake,period);
+      // vTaskDelay(period);
 
       // Calculate ticks since we last woke up, and track the jitter
       ticks = xTaskGetTickCount();

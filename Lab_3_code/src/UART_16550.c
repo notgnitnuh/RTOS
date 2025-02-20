@@ -3,7 +3,7 @@
 // comment or delete the next line when you start part 4 of the lab
 #define ORIGINAL_PUT_CHAR
 
-#define UART_16550_USE_STATIC_ALLOCATION
+// #define UART_16550_USE_STATIC_ALLOCATION
 #define UART_16550_RX_BUFFER_SIZE 128
 #define UART_16550_TX_BUFFER_SIZE 512
 
@@ -180,10 +180,12 @@ static void handle_tx_interrupt(UART_16550_descriptor_t *device,
 
       // ------------ STUDENTS Insert code here
       
+      
       // If the stream buffer is empty, change the state of the
       // transmitter software state machine.
 
       // ------------ STUDENTS Insert code here
+      device->tx_state = TX_EMPTY;
 
       //   If you moved some bytes to the FIFO, then the new state is
       //   TX_FIFO.
@@ -389,30 +391,51 @@ void UART_16550_configure(int UART,int baud,int parity,int bits,int stop_bits)
   // Write the baud rate divisor
 
   // ------------ STUDENTS Insert code here
+  uart[UART].dev->DLL = divisor;
+
 
   // Set the parity (make sure that it is one of the three valid options)
   ASSERT(parity >= 0 && parity < 3);
 
   // ------------ STUDENTS Insert code here
+  if(parity == 1)
+    uart[UART].dev->LCR.EPS = 0;
+  else if (parity == 2)
+    uart[UART].dev->LCR.EPS = 1;
+
+  uart[UART].dev->LCR.PEN = 1;
+  uart[UART].dev->LCR.SP = 0;
+
 
   // Set the number of data bits
   ASSERT(bits>4 && bits < 9);
 
   // ------------ STUDENTS Insert code here
+  uart[UART].dev->LCR.WLS = bits-5;
+
 
   // Set the number of stop bits
   ASSERT(stop_bits > 0 && stop_bits < 3);
 
   // ------------ STUDENTS Insert code here
+  uart[UART].dev->LCR.STB = stop_bits-1;
 
   // Reset and enable the FIFOs.
 
   // ------------ STUDENTS Insert code here
+  uart[UART].dev->FCR.RF_reset = 1;     // set FIFO resets high
+  uart[UART].dev->FCR.XF_reset = 1;     // set FIFO resets high
+  uart[UART].dev->FCR.FIFOEN = 1;     // set FIFO enable
+
   
   // Enable receiver and transmitter interrupts. Disable line control
   // and modem status interrupts.
 
   // ------------ STUDENTS Insert code here
+  uart[UART].dev->IER.EDSSI = 0;
+  uart[UART].dev->IER.ELSI = 0;
+  uart[UART].dev->IER.ETBEI = 1;
+  uart[UART].dev->IER.ERBFI = 0;
 
   // Enable interrupts on the NVIC
 
@@ -431,6 +454,7 @@ BaseType_t UART_16550_tx_lock(int UART,
   ASSERT(UART >= 0 && UART < NUM_UARTS);
   
   // ------------ STUDENTS Insert code here
+  return xSemaphoreTakeRecursive(uart[UART].TX_mutex, xTicksToWait);
 }
 
 /*****************************************************************************/
@@ -442,6 +466,7 @@ void UART_16550_tx_unlock(int UART)
   ASSERT(UART >= 0 && UART < NUM_UARTS);
   
   // ------------ STUDENTS Insert code here
+  xSemaphoreGiveRecursive(uart[UART].TX_mutex);
 }
 
 /*****************************************************************************/
@@ -462,7 +487,9 @@ BaseType_t UART_16550_put_char(int UART,
   // cannot interfere ( the ISR can sill interrupt us).
 
   // ------------ STUDENTS Insert code here
-
+  if(xSemaphoreTakeRecursive(uart[UART].TX_mutex, xTicksToWait) == pdFAIL){
+    return pdFAIL;
+  };
 
   // Wait until transmitter holding register is empty
   while (!uart[UART].dev->LSR.THRE);
@@ -471,7 +498,8 @@ BaseType_t UART_16550_put_char(int UART,
 
   // Release the mutex.
 
-// ------------ STUDENTS Insert code here
+  // ------------ STUDENTS Insert code here
+  xSemaphoreGiveRecursive(uart[UART].TX_mutex);
 
   return pdPASS;
 }
@@ -498,10 +526,14 @@ BaseType_t UART_16550_put_char(int UART,
   // cannot interfere ( the ISR can sill interrupt us).
 
   // ------------ STUDENTS Insert code here
-
+  if(xSemaphoreTakeRecursive(uart[UART].TX_mutex, xTicksToWait) == pdFAIL){
+    return pdFAIL;
+  };
+  
   // Enter a CRITICAL SECTION, so that even the ISR cannot interrupt us
   
   // ------------ STUDENTS Insert code here
+  taskENTER_CRITICAL();
 
   // Make decisions based on the current state of the transmit
   // software state machine.
@@ -509,12 +541,17 @@ BaseType_t UART_16550_put_char(int UART,
     {
     case TX_EMPTY:
       // If the software state machine is in the TX_EMPTY state, then
-      // write our character directly to the UART FIFO and set the
+      // write our character directly to the UART FIFO and
       // change the transmit software state machine state to TX_FIFO.
       // To indicate that there is data in the UART FIFO, but the
       // transmit stream buffer is empty.
 
       // ------------ STUDENTS Insert code here
+      // Wait until transmitter holding register is empty
+      while (!uart[UART].dev->LSR.THRE);
+      // Send the character
+      uart[UART].dev->THR = c;
+      uart[UART].tx_state = TX_FIFO;
 
       break;
     case TX_FIFO:
@@ -524,6 +561,10 @@ BaseType_t UART_16550_put_char(int UART,
       // that there is data in the transmit stream buffer.
 
       // ------------ STUDENTS Insert code here
+      // Wait until transmitter holding register is empty
+      while (!uart[UART].dev->LSR.THRE);
+      xStreamBufferSend(uart[UART].TX_buffer, c, 1, xTicksToWait);
+      uart[UART].tx_state = TX_BUFFER;
 
       break;
     case TX_BUFFER:
@@ -531,11 +572,19 @@ BaseType_t UART_16550_put_char(int UART,
       //   Find out how much space is available in the transmit stream buffer.
 
       // ------------ STUDENTS Insert code here
+      // size_t spaceUsed = xStreamBufferBytesAvailable(uart[UART].TX_buffer);
 
       //   If the buffer is not full then we can write our character
       //   to it and continue.
       
       // ------------ STUDENTS Insert code here
+      if(xStreamBufferIsFull == pdFALSE){
+        // Wait until transmitter holding register is empty
+        while (!uart[UART].dev->LSR.THRE);
+        xStreamBufferSend(uart[UART].TX_buffer, c, 1, xTicksToWait);
+      }
+      else{
+        
 
       //   Otherwise, things get a bit trickier.  The stream buffer is
       //   full, so a write to the stream buffer could block this task
@@ -556,11 +605,13 @@ BaseType_t UART_16550_put_char(int UART,
       //      indicate that we left the critical section early.
       
       // ------------ STUDENTS Insert code here
+        still_in_critical_section = 0;
 
       //      Exit the critical section so the ISR can eventually move
       //      data out of the buffer and unblock this thread.
 
       // ------------ STUDENTS Insert code here
+        taskEXIT_CRITICAL();
 
       //      Write our character to the stream buffer, using the
       //      timeout value that was passed in to this function, and
@@ -568,7 +619,8 @@ BaseType_t UART_16550_put_char(int UART,
       //      function. 
 
       // ------------ STUDENTS Insert code here
-
+        int result = xStreamBufferSend(uart[UART].TX_buffer, c, 1, xTicksToWait);
+      }
       break;
     default:
       while(1); // Illegal tx_state.  Go into infinite loop for
@@ -580,14 +632,18 @@ BaseType_t UART_16550_put_char(int UART,
   // section.
 
   // ------------ STUDENTS Insert code here
+  if(still_in_critical_section)
+    taskEXIT_CRITICAL();
 
   // Release the mutex.
 
   // ------------ STUDENTS Insert code here
+  xSemaphoreGiveRecursive(uart[UART].TX_mutex);
 
   // Return pdPASS or pdFAIL.
 
   // ------------ STUDENTS Insert code here
+  return pdPASS;
 
 }
 
@@ -606,6 +662,10 @@ BaseType_t UART_16550_write_string(int UART,
   // get it)
 
   // ------------ STUDENTS Insert code here
+  if(xSemaphoreTakeRecursive(uart[UART].TX_mutex, xTicksToWait) == pdFAIL){
+    return pdFAIL;
+  };
+
 
   // Use the put char function to send characters.  This could be
   // greatly improved.
@@ -616,6 +676,8 @@ BaseType_t UART_16550_write_string(int UART,
   // release the TX mutex
 
   // ------------ STUDENTS Insert code here
+  xSemaphoreGiveRecursive(uart[UART].TX_mutex);
+
   
   return pdPASS;
 }
@@ -630,6 +692,7 @@ BaseType_t UART_16550_rx_lock(int UART,
   ASSERT(UART >= 0 && UART < NUM_UARTS);
 
   // ------------ STUDENTS Insert code here
+  return xSemaphoreTakeRecursive(uart[UART].RX_mutex, xTicksToWait);
   
 }
 
@@ -642,6 +705,7 @@ void UART_16550_rx_unlock(int UART)
   ASSERT(UART >= 0 && UART < NUM_UARTS);
   
   // ------------ STUDENTS Insert code here
+  return xSemaphoreGiveRecursive(uart[UART].RX_mutex);
 
 }
 
@@ -657,6 +721,9 @@ BaseType_t UART_16550_get_char(int UART, char *ch,
   // get it)
 
   // ------------ STUDENTS Insert code here
+  if(xSemaphoreTakeRecursive(uart[UART].RX_mutex, xTicksToWait) == pdFAIL){
+    return pdFAIL;
+  };
 
   // Attempt to read a character from the receive (RX) stream buffer
   // using xTicksToWait. It could fail (time out), so keep the value
@@ -667,6 +734,7 @@ BaseType_t UART_16550_get_char(int UART, char *ch,
   // Release the mutex.
   
   // ------------ STUDENTS Insert code here
+  xSemaphoreGiveRecursive(uart[UART].RX_mutex);
 
   // Return the value we got from the attempt to read.
 
@@ -687,6 +755,10 @@ BaseType_t UART_16550_read_string(int UART,
   // get it)
 
   // ------------ STUDENTS Insert code here
+  // ------------ STUDENTS Insert code here
+  if(xSemaphoreTakeRecursive(uart[UART].RX_mutex, xTicksToWait) == pdFAIL){
+    return pdFAIL;
+  };
 
   // Read characters (using the UART_16550_get_char function) until
   // maxLength-1 or until we get an ASCII newline character or ASCII
@@ -699,6 +771,7 @@ BaseType_t UART_16550_read_string(int UART,
   // ------------ STUDENTS Insert code here
 
   // Release the mutex.
+  xSemaphoreGiveRecursive(uart[UART].RX_mutex);
 
   // ------------ STUDENTS Insert code here
 
