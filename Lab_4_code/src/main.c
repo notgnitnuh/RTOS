@@ -2,7 +2,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <UART_16550.h>
-#include <echo_task.h>
 #include <hello_task.h>
 #include <stats_task.h>
 #include <device_addrs.h>
@@ -12,7 +11,6 @@
 
 int main( void )
 {
-  TaskHandle_t echo_handle = NULL;
   TaskHandle_t hello_handle = NULL;
   TaskHandle_t stats_handle = NULL;
 
@@ -26,16 +24,13 @@ int main( void )
   UART_16550_configure(UART0,9600,UART_PARITY_NONE,8,2);
   UART_16550_configure(UART1,9600,UART_PARITY_NONE,8,2);
   
-  echo_handle = xTaskCreateStatic(echo_task,"echo",ECHO_STACK_SIZE,
-    NULL,3,echo_stack,&echo_TCB);
-
-  // /* Create the task without using any dynamic memory allocation. */
-  // hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
-	// 			   NULL,3,hello_stack,&hello_TCB);
+  /* Create the task without using any dynamic memory allocation. */
+  hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
+				   NULL,3,hello_stack,&hello_TCB);
 			      
-  // /* Create the task without using any dynamic memory allocation. */
-  // stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
-	// 			   NULL,2,stats_stack,&stats_TCB);
+  /* Create the task without using any dynamic memory allocation. */
+  stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
+				   NULL,2,stats_stack,&stats_TCB);
 			      
   /* start the scheduler */
   vTaskStartScheduler();

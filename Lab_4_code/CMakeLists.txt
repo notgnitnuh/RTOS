@@ -44,7 +44,7 @@ add_custom_target(extra-clean
 # out FreeRTOS and CMSIS
 add_custom_target(tarfile
   COMMAND make extra-clean
-  COMMAND cd ..\; tar --exclude='CMakeCache.txt' --exclude='CMakeFiles/*' --exclude='CMSIS/*' --exclude='FreeRTOS/*' --exclude='CMSIS' --exclude='FreeRTOS' --exclude='Makefile' -czf ${DirName}.tgz ${DirName}
+  COMMAND cd ..\; tar --exclude='CMakeCache.txt' --exclude='CMakeFiles/*' --exclude='CMSIS/*' --exclude='FreeRTOS/*' --exclude=src/UART_16550.c --exclude='Makefile' -czf ${DirName}.tgz ${DirName}\;
   COMMENT Make realclean, then create a tgz file in the parent directory
   )
 
@@ -106,7 +106,6 @@ file(GLOB FREERTOS_SOURCES
 # Sources for the executable
 file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/main.c"
-  "${CMAKE_SOURCE_DIR}/src/echo_task.c"
   "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/stats_task.c"
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
