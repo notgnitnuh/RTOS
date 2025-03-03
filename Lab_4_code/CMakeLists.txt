@@ -88,6 +88,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3
   ${CMAKE_SOURCE_DIR}/CMSIS/CMSIS/Core/Include
   ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
+  ${CMAKE_SOURCE_DIR}/PDCurses
 )
 
 # list of FreeRTOS sources that we need
@@ -130,7 +131,7 @@ add_link_options(-T ${LINKER_SCRIPT} --specs=nosys.specs -nostartfiles)
 
 # Define our target executable, and everything that it depends on
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-add_executable(${PROJECT_NAME}.elf ${SOURCES} ${FREERTOS_SOURCES} ${LINKER_SCRIPT})
+add_executable(${PROJECT_NAME}.elf ${SOURCES} ${FREERTOS_SOURCES} ${PDCURSES_SOURCES} ${LINKER_SCRIPT})
 
 set(ELF_FILE ${PROJECT_NAME}.elf)
 set(HEX_FILE ${PROJECT_NAME}.hex)

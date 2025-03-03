@@ -31,12 +31,12 @@ int main( void )
 				   NULL,3,firework_stack,&firework_TCB);
   
   /* Create the task without using any dynamic memory allocation. */
-  hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
-				   NULL,3,hello_stack,&hello_TCB);
+  // hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
+	// 			   NULL,3,hello_stack,&hello_TCB);
 			      
-  /* Create the task without using any dynamic memory allocation. */
-  stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
-				   NULL,2,stats_stack,&stats_TCB);
+  // /* Create the task without using any dynamic memory allocation. */
+  // stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
+	// 			   NULL,2,stats_stack,&stats_TCB);
 			      
   /* start the scheduler */
   vTaskStartScheduler();

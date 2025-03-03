@@ -34,8 +34,7 @@ void firework_task(void *pvParameters)
     for (i = 0; i < 8; i++)
         init_pair(i, color_table[i], COLOR_BLACK);
 
-    seed = time((time_t *)0);
-    srand(seed);
+    srand(2462025);
     flag = 0;
 
     while (getch() == ERR)      /* loop until a key is hit */
