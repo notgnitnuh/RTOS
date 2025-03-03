@@ -102,12 +102,18 @@ file(GLOB FREERTOS_SOURCES
 # add more as needed
 )  
 
+# Sources for PDcurses
+file(GLOB PDCURSES_SOURCES
+  "${CMAKE_SOURCE_DIR}/PDCurses/pdcurses/*.c"
+)
+
 
 # Sources for the executable
 file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/main.c"
   "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/stats_task.c"
+  "${CMAKE_SOURCE_DIR}/src/firework_task.c"
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
   "${CMAKE_SOURCE_DIR}/src/UART_16550.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"

@@ -5,3 +5,5 @@ CMakeCache.txt
 */CMSIS 
 */FreeRTOS
 */Makefile
+ANSI
+PDCurses

@@ -4,6 +4,7 @@
 #include <UART_16550.h>
 #include <hello_task.h>
 #include <stats_task.h>
+#include <firework_task.h>
 #include <device_addrs.h>
 
 // "screen /dev/ttyUSB1 9600"
@@ -13,6 +14,7 @@ int main( void )
 {
   TaskHandle_t hello_handle = NULL;
   TaskHandle_t stats_handle = NULL;
+  TaskHandle_t firework_handle = NULL;
 
   NVIC_SetPriority(UART0_IRQ,0x6); // priority for UART
   NVIC_SetPriority(UART1_IRQ,0x6); // priority for UART
@@ -23,6 +25,10 @@ int main( void )
   // Configure UART0 for 9600/N/8/2
   UART_16550_configure(UART0,9600,UART_PARITY_NONE,8,2);
   UART_16550_configure(UART1,9600,UART_PARITY_NONE,8,2);
+
+  /* Create the task without using any dynamic memory allocation. */
+  firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,
+				   NULL,3,firework_stack,&firework_TCB);
   
   /* Create the task without using any dynamic memory allocation. */
   hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
