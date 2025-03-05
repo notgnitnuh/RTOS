@@ -2,8 +2,8 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <UART_16550.h>
-#include <hello_task.h>
-#include <stats_task.h>
+// #include <hello_task.h>
+// #include <stats_task.h>
 #include <firework_task.h>
 #include <device_addrs.h>
 
@@ -12,8 +12,8 @@
 
 int main( void )
 {
-  TaskHandle_t hello_handle = NULL;
-  TaskHandle_t stats_handle = NULL;
+  // TaskHandle_t hello_handle = NULL;
+  // TaskHandle_t stats_handle = NULL;
   TaskHandle_t firework_handle = NULL;
 
   NVIC_SetPriority(UART0_IRQ,0x6); // priority for UART

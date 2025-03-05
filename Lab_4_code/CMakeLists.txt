@@ -89,6 +89,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/CMSIS/CMSIS/Core/Include
   ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
   ${CMAKE_SOURCE_DIR}/PDCurses
+  ${CMAKE_SOURCE_DIR}/ANSI/drivers
 )
 
 # list of FreeRTOS sources that we need
@@ -106,6 +107,7 @@ file(GLOB FREERTOS_SOURCES
 # Sources for PDcurses
 file(GLOB PDCURSES_SOURCES
   "${CMAKE_SOURCE_DIR}/PDCurses/pdcurses/*.c"
+  "${CMAKE_SOURCE_DIR}/ANSI/*.c"
 )
 
 

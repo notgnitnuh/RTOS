@@ -2,12 +2,34 @@
 #include <stdlib.h>
 #include <time.h>
 #include <firework_task.h>
+#include <task.h>
+#include <UART_16550.h>
+#include <stdio.h>
+
+
+
+/* Dimensions the buffer that the task being created will use as its
+stack. NOTE: This is the number of words the stack will hold, not the
+number of bytes. For example, if each stack item is 32-bits, and this
+is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
+#define FIREWORK_STACK_SIZE 256
+
+/* Structure that will hold the TCB of the task being created. */
+StaticTask_t firework_TCB;
+
+/* Buffer that the task being created will use as its stack. Note this
+is an array of StackType_t variables. The size of StackType_t is
+dependent on the RTOS port. */
+StackType_t firework_stack[ FIREWORK_STACK_SIZE ];
 
 #define DELAYSIZE 200
+#define COLS 50
+#define ROWS 50
 
 void myrefresh(void);
 void get_color(void);
 void explode(int, int);
+
 
 short color_table[] =
 {
@@ -34,7 +56,7 @@ void firework_task(void *pvParameters)
     for (i = 0; i < 8; i++)
         init_pair(i, color_table[i], COLOR_BLACK);
 
-    srand(2462025);
+    srand(1);
     flag = 0;
 
     while (getch() == ERR)      /* loop until a key is hit */
@@ -76,8 +98,6 @@ void firework_task(void *pvParameters)
     }
 
     endwin();
-
-    return 0;
 }
 
 void explode(int row, int col)
