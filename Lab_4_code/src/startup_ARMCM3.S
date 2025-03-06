@@ -199,6 +199,9 @@ Default_Handler:
 	provide_DUMMY _write
 	provide_DUMMY _fstat_r
 	provide_DUMMY _isatty_r
+        provide_DUMMY _gettimeofday_r
+        provide_DUMMY _open_r
+        provide_DUMMY _times_r
         
 	
 

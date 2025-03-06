@@ -822,3 +822,37 @@ BaseType_t UART_16550_read_string(int UART,
 }
 
 
+
+// Return the number of characters available in the receiver stream buffer
+int UART_16550_chars_available(int UART_number){
+  // Assert that the uart number is good.
+  ASSERT(UART_number >= 0 && UART_number < NUM_UARTS);
+  
+  
+  return xStreamBufferSpacesAvailable(uart[UART_number].RX_buffer);
+
+}
+
+// Flush the UART receiver FIFO and receiver stream buffer
+void UART_16550_flush_rx(int UART_number){
+
+  // Assert that the uart number is good.
+  ASSERT(UART_number >= 0 && UART_number < NUM_UARTS);
+
+  if(UART_16550_rx_lock(UART_number, portMAX_DELAY) == pdFAIL){
+    return pdFAIL;
+  };
+
+  char ch;
+  // empty FIFIO
+  while(uart[UART_number].dev->LSR.DR == 1)
+  {
+    ch = uart[UART_number].dev->RBR;
+  }
+
+  while(!xStreamBufferIsEmpty(uart[UART_number].RX_buffer)){
+    xStreamBufferReceive(uart[UART_number].RX_buffer, &ch, 1, 1);
+  }
+  UART_16550_rx_unlock(UART_number);
+
+}

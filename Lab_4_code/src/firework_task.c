@@ -1,6 +1,6 @@
 #include <curses.h>
 #include <stdlib.h>
-#include <time.h>
+// #include <time.h>
 #include <firework_task.h>
 #include <task.h>
 #include <UART_16550.h>
@@ -41,7 +41,7 @@ short color_table[] =
 
 void firework_task(void *pvParameters)
 {
-    time_t seed;
+    // time_t seed;
     int start, end, row, diff, flag, direction;
     short i;
 

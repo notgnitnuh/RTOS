@@ -89,6 +89,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/CMSIS/CMSIS/Core/Include
   ${CMAKE_SOURCE_DIR}/CMSIS/Device/ARM/ARMCM3/Include
   ${CMAKE_SOURCE_DIR}/PDCurses
+  ${CMAKE_SOURCE_DIR}/PDCurses/common
   ${CMAKE_SOURCE_DIR}/ANSI/drivers
 )
 
@@ -108,6 +109,8 @@ file(GLOB FREERTOS_SOURCES
 file(GLOB PDCURSES_SOURCES
   "${CMAKE_SOURCE_DIR}/PDCurses/pdcurses/*.c"
   "${CMAKE_SOURCE_DIR}/ANSI/*.c"
+  "${CMAKE_SOURCE_DIR}/ANSI/drivers/*.c"
+  "${CMAKE_SOURCE_DIR}/ANSI/drivers/FreeRTOS/driver_table.c"
 )
 
 
@@ -120,6 +123,7 @@ file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
   "${CMAKE_SOURCE_DIR}/src/UART_16550.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"
+  # "${CMAKE_SOURCE_DIR}/src/heap_useNewlib.c"
 )
 
 # Define our linker script

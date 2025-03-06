@@ -64,6 +64,7 @@
 // If you're *really* sure you don't need FreeRTOS's newlib reentrancy support, remove this warning...
 #endif
 #include "task.h"
+#include <semphr.h>
 
 // ================================================================================================
 // External routines required by newlib's malloc (sbrk/_sbrk, __malloc_lock/unlock)
@@ -122,22 +123,47 @@ void * sbrk(int incr)
 //! _sbrk is a synonym for sbrk.
 char * _sbrk(int incr) { return sbrk(incr); };
 
+static SemaphoreHandle_t malloc_mutex;
+static SemaphoreHandle_t env_mutex;
+static StaticSemaphore_t malloc_scb;
+static StaticSemaphore_t env_scb;
+
 void __malloc_lock(struct _reent *re)
 {
+	static int firstcall = 1;
+	if(firstcall){
+		firstcall = 0;
+		malloc_mutex = xSemaphoreCreateMutexStatic(&malloc_scb);
+	}
 #ifdef DEBUG
 	BaseType_t insideAnISR = xPortIsInsideInterrupt();
 	configASSERT(insideAnISR == pdFALSE); // Make damn sure no more mallocs inside ISRs!!
 #endif
-	vTaskSuspendAll();
+	// vTaskSuspendAll();
+	xSemaphoreTake(malloc_mutex,portMAX_DELAY);
 };
-void __malloc_unlock(struct _reent *re)   { (void)xTaskResumeAll();  };
+void __malloc_unlock(struct _reent *re)   {
+	// (void) xTaskResumeAll();
+	xSemaphoreGive(malloc_mutex);
+};
 
 // newlib also requires implementing locks for the application's environment memory space,
 // accessed by newlib's setenv() and getenv() functions.
 // As these are trivial functions, momentarily suspend task switching (rather than semaphore).
 // ToDo: Move __env_lock/unlock to a separate newlib helper file.
-void __env_lock()    {       vTaskSuspendAll(); };
-void __env_unlock()  { (void)xTaskResumeAll();  };
+void __env_lock()    {       
+	
+	// static int firstcall = 1;
+	// if(firstcall){
+	// 	firstcall = 0;
+	// 	env_mutex xSemaphoreCreateMutexStatic(&env_scb);
+	// }
+	vTaskSuspendAll(); 
+};
+void __env_unlock()  { 
+	(void)xTaskResumeAll();
+	// xSemaphoreGive(env_mutex); // TODO: may be able to use mutex instead of suspendAll
+};
 
 /// /brief  Wrap malloc/malloc_r to help debug who requests memory and why.
 /// Add to the linker command line: -Xlinker --wrap=malloc -Xlinker --wrap=_malloc_r
