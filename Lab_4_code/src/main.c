@@ -23,8 +23,8 @@ int main( void )
   UART_16550_init();
 
   // Configure UART0 for 9600/N/8/2
-  UART_16550_configure(UART0,9600,UART_PARITY_NONE,8,2);
-  UART_16550_configure(UART1,9600,UART_PARITY_NONE,8,2);
+  UART_16550_configure(UART0,57600,UART_PARITY_NONE,8,1);
+  UART_16550_configure(UART1,57600,UART_PARITY_NONE,8,1);
 
   /* Create the task without using any dynamic memory allocation. */
   firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,

@@ -1,0 +1,41 @@
+Exam 1: Review for 3/7/2025
+
+Free RTOS, Book (1-5, 6, 8.2 & 10)
+
+(¼ - ⅓ of exam)
+Chapter 1,2&3 (slide set 1&2)
+    Compilation sequence (Linker generated output files, 2.2)
+    What is an RTOS? (Slides, probably not book)
+    How do you compile the code, what are the components and what do they do (linker, compiler, etc.)
+    ELF 2.3
+    Memory map (2.4)
+    Sections (Figure 2.6)
+    Booting, running from ROM, (slide set 2)
+Chapter 4 (slide set 3)
+    Scheduler
+
+Chapter 5 (slide set 4)
+    Figure 5.2 (or version from slides)
+    States etc.
+    TCB what is?
+    5.1
+    What sections of memory need to be set up (e.g. passed into xtaskcreatestatic)
+    Operations to do on tasks (5.4.2)
+    Free RTOS Tasks section
+    Review task creation etc.
+Chapter 10 (slide set 5?)
+    Interrupt controller
+    Exception priorities
+    Processing General Exceptions (10.5)
+    Image from slides
+    Installing exception handlers (10.5.1)
+    Interrupt Response Time (10.9 or slides)
+    Two part interrupt handlers (understand, and costs/benefits)
+    Semaphores and Mutexes
+Chapter 6 
+    Semaphores
+    Mutexes (6.2.3 <- this is the key section)
+    Priority inversion <- key section of key section
+
+Chapter 8 (pipes specifically)
+    What object in FreeRTOS is essentially a pipe? (Buffer!)

@@ -12,7 +12,7 @@
 stack. NOTE: This is the number of words the stack will hold, not the
 number of bytes. For example, if each stack item is 32-bits, and this
 is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
-#define FIREWORK_STACK_SIZE 256
+#define FIREWORK_STACK_SIZE 2048
 
 /* Structure that will hold the TCB of the task being created. */
 StaticTask_t firework_TCB;
@@ -22,7 +22,7 @@ is an array of StackType_t variables. The size of StackType_t is
 dependent on the RTOS port. */
 StackType_t firework_stack[ FIREWORK_STACK_SIZE ];
 
-#define DELAYSIZE 200
+#define DELAYSIZE 100
 #define COLS 50
 #define ROWS 50
 

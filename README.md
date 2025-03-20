@@ -1,3 +1,5 @@
+Requires FreeRTOS () and PDCurses() #TODO: add links
+
 Lab 1: 2/3/2025
 1. Simple hello world and intro to J-link debugging
 
@@ -9,3 +11,7 @@ Lab 2: 2/10/2025
 Lab 3: 
 1. Set up 16550 UART driver to improve UART communications.
 2. Work to set up interrupts, stream buffer, locks, etc. 
+
+Lab 4: 
+1. Downloaded PDCurses, built up the port and got firework_task working
+2. Downloaded Ninvaders, got working
