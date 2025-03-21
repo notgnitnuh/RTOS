@@ -727,8 +727,7 @@ BaseType_t UART_16550_read_string(int UART,
 // Return the number of characters available
 int UART_16550_chars_available(int UART_number)
 {
-  int avail = xStreamBufferBytesAvailable(uart[UART_number].RX_buffer);
-  return avail;
+  return xStreamBufferBytesAvailable(uart[UART_number].RX_buffer);
 }
 
 /*****************************************************************************/

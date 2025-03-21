@@ -2,19 +2,24 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <UART_16550.h>
-// #include <hello_task.h>
-// #include <stats_task.h>
+#include <hello_task.h>
+#include <stats_task.h>
 #include <firework_task.h>
 #include <device_addrs.h>
+// #include <testcurs_task.h>
+#include <nInvaders.h>
 
 // "screen /dev/ttyUSB1 9600"
 
 
 int main( void )
 {
-  // TaskHandle_t hello_handle = NULL;
-  // TaskHandle_t stats_handle = NULL;
+  TaskHandle_t hello_handle = NULL;
+  TaskHandle_t stats_handle = NULL;
   TaskHandle_t firework_handle = NULL;
+  TaskHandle_t testcurs_handle = NULL;
+  TaskHandle_t nInvaders_handle = NULL;
+
 
   NVIC_SetPriority(UART0_IRQ,0x6); // priority for UART
   NVIC_SetPriority(UART1_IRQ,0x6); // priority for UART
@@ -22,21 +27,33 @@ int main( void )
   // Intitialize all UARTS
   UART_16550_init();
 
-  // Configure UART0 for 9600/N/8/2
+  // Configure UART0 for 57600/N/8/2
   UART_16550_configure(UART0,57600,UART_PARITY_NONE,8,1);
   UART_16550_configure(UART1,57600,UART_PARITY_NONE,8,1);
 
   /* Create the task without using any dynamic memory allocation. */
-  firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,
-				   NULL,3,firework_stack,&firework_TCB);
+  // firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,
+	// 			   NULL,3,firework_stack,&firework_TCB);
+  // xTaskCreate(firework_task,"firework",FIREWORK_STACK_SIZE,
+  //   			   NULL,3,firework_handle);
+  // xTaskCreate(ninvaders_task, "ninvaders", NINVADERS_STACK_SIZE,
+  //             NULL,3,nInvaders_handle);
+  nInvaders_handle = xTaskCreateStatic(ninvaders_task, "ninvaders", NINVADERS_STACK_SIZE,
+            NULL,3,nInvaders_stack,&nInvaders_TCB);
+
+  /* Create the task without using any dynamic memory allocation. */
+  // testcurs_handle = xTaskCreateStatic(testcurs_task,"testcurs",TESTCURS_STACK_SIZE,
+	// 			   NULL,3,testcurs_stack,&testcurs_TCB);
+  // xTaskCreate(testcurs_task,"testcurs",TESTCURS_STACK_SIZE,
+  //   			   NULL,3,testcurs_handle);
   
   /* Create the task without using any dynamic memory allocation. */
-  // hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
-	// 			   NULL,3,hello_stack,&hello_TCB);
+  hello_handle = xTaskCreateStatic(hello_task,"hello",HELLO_STACK_SIZE,
+				   NULL,3,hello_stack,&hello_TCB);
 			      
   // /* Create the task without using any dynamic memory allocation. */
-  // stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
-	// 			   NULL,2,stats_stack,&stats_TCB);
+  stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
+				   NULL,2,stats_stack,&stats_TCB);
 			      
   /* start the scheduler */
   vTaskStartScheduler();

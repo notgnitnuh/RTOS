@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "random": "c"
+        "random": "c",
+        "uart_16550.h": "c",
+        "stats_task.h": "c"
     }
 }

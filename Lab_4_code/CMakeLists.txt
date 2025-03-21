@@ -91,6 +91,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/PDCurses
   ${CMAKE_SOURCE_DIR}/PDCurses/common
   ${CMAKE_SOURCE_DIR}/PDCurses/ANSI/drivers
+  ${CMAKE_SOURCE_DIR}/ninvaders
 )
 
 # list of FreeRTOS sources that we need
@@ -120,6 +121,8 @@ file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/stats_task.c"
   "${CMAKE_SOURCE_DIR}/src/firework_task.c"
+  # "${CMAKE_SOURCE_DIR}/src/testcurs_task.c"
+  "${CMAKE_SOURCE_DIR}/src/nInvaders.c"
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
   "${CMAKE_SOURCE_DIR}/src/UART_16550.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"
