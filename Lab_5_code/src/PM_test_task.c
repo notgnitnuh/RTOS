@@ -1,0 +1,37 @@
+
+#include <PM_test_task.h>
+#include <task.h>
+#include <UART_16550.h>
+#include <stdio.h>
+#include <FreeRTOS.h>
+
+// "screen /dev/ttyUSB1 9600"
+
+void PM_test_task(void *pvParameters){
+
+    TickType_t lastwake = xTaskGetTickCount();
+  char buffer[64];
+  while(1){
+    vTaskDelayUntil(&lastwake,1000);
+    sprintf(buffer, "It's working!\r\n");
+    UART_16550_write_string(UART1,buffer,portMAX_DELAY);
+  }
+
+}
+
+/* Dimensions the buffer that the task being created will use as its
+stack. NOTE: This is the number of words the stack will hold, not the
+number of bytes. For example, if each stack item is 32-bits, and this
+is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
+#define PM_TEST_STACK_SIZE 256
+
+/* Structure that will hold the TCB of the task being created. */
+StaticTask_t PM_test_TCB;
+
+/* Buffer that the task being created will use as its stack. Note this
+is an array of StackType_t variables. The size of StackType_t is
+dependent on the RTOS port. */
+StackType_t PM_test_stack[ PM_TEST_STACK_SIZE ];
+
+
+

@@ -27,7 +27,6 @@
 #include "view.h"
 #include "globals.h"
 #include <FreeRTOS.h>
-#include <timers.h>
 
 
 #ifndef NINVADERS
@@ -37,7 +36,7 @@
 stack. NOTE: This is the number of words the stack will hold, not the
 number of bytes. For example, if each stack item is 32-bits, and this
 is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
-#define NINVADERS_STACK_SIZE 4096
+#define NINVADERS_STACK_SIZE 2048
 
 /* Structure that will hold the TCB of the task being created. */
 extern StaticTask_t nInvaders_TCB;
