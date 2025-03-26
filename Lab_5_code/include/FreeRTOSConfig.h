@@ -62,7 +62,7 @@
     Heap Limit (default __HeapLimit): end address of heap
     Heap size (default __heap_size): size of the heap memory in bytes */
 
-#define configUSE_HEAP_SCHEME                            (3)
+#define configUSE_HEAP_SCHEME                            (6)
 
 /* TOTAL_HEAP_SIZE is not used with heap scheme 6 */
 #define configTOTAL_HEAP_SIZE                            ((size_t)(0x8000))
@@ -105,8 +105,8 @@ void vAssertCalled( unsigned line, const char * const filename );
 
 #define configUSE_MUTEXES                         1
 #define configUSE_RECURSIVE_MUTEXES               1
-#define configUSE_TIMERS                          0
-#define configTIMER_TASK_STACK_DEPTH              (256)
+#define configUSE_TIMERS                          1
+#define configTIMER_TASK_STACK_DEPTH              (1024)
 
 // Set up everything needed for statistics reporting.  All af the
 // following must be set to get the runtime stats task to run

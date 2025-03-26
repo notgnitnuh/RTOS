@@ -1,4 +1,8 @@
 {
     "cortex-debug.gdbPath": "/usr/bin/gdb-multiarch",
-    "cmake.buildDirectory": "${workspaceFolder}"
+    "cmake.buildDirectory": "${workspaceFolder}",
+    "files.associations": {
+        "cstdint": "c",
+        "uart_16550.h": "c"
+    }
 }

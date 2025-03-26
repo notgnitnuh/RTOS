@@ -100,6 +100,7 @@ file(GLOB FREERTOS_SOURCES
    "${CMAKE_SOURCE_DIR}/FreeRTOS/list.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/queue.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/mutex.c"
+   "${CMAKE_SOURCE_DIR}/FreeRTOS/timers.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/stream_buffer.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3/port.c"
   #  "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/MemMang/heap_3.c"
@@ -126,7 +127,7 @@ file(GLOB SOURCES
   "${CMAKE_SOURCE_DIR}/ninvaders/*c"
   "${CMAKE_SOURCE_DIR}/src/AXI_timer.c"
   "${CMAKE_SOURCE_DIR}/src/UART_16550.c"
-  # "${CMAKE_SOURCE_DIR}/PDCurses/ANSI/drivers/FreeRTOS/UART_16550.c"
+  "${CMAKE_SOURCE_DIR}/src/pulse_modulator.c"
   "${CMAKE_SOURCE_DIR}/src/startup_ARMCM3.S"
   "${CMAKE_SOURCE_DIR}/src/heap_useNewlib.c"
 )

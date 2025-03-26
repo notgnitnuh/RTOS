@@ -18,8 +18,8 @@
     "serialNumber": "", //If you have more than one J-Link probe, add the serial number here.
     // "runToMain": true,
     "armToolchainPath": "/usr/bin/",
-    "svdFile": "${workspaceRoot}/Lab_4_code/CMSIS/Device/ARM/SVD/ARMCM3.svd",
-    "executable": "${workspaceRoot}/Lab_4_code/bin/Lab_4_code.elf"
+    "svdFile": "${workspaceRoot}/Lab_5_code/CMSIS/Device/ARM/SVD/ARMCM3.svd",
+    "executable": "${workspaceRoot}/Lab_5_code/bin/Lab_5_code.elf"
     }
     ]
 }

@@ -38,7 +38,7 @@
 stack. NOTE: This is the number of words the stack will hold, not the
 number of bytes. For example, if each stack item is 32-bits, and this
 is set to 100, then 400 bytes (100 * 32-bits) will be allocated. */
-#define NINVADERS_STACK_SIZE 2048
+#define NINVADERS_STACK_SIZE 4096
 
 /* Structure that will hold the TCB of the task being created. */
 StaticTask_t nInvaders_TCB;
@@ -59,6 +59,8 @@ int status; // status handled in timer
 #define GAME_EXIT 5
 #define GAME_HIGHSCORE 6
 
+StaticTimer_t timerbuffer;
+TimerHandle_t ninvader_timer;
 
 
 
@@ -222,7 +224,6 @@ void readInput()
  * timer
  * this method is executed every 1 / FPS seconds  
  */
-// void handleTimer(TimerHandle_t xTimer)
 void handleTimer()
 {
 	static int aliens_move_counter = 0; 
@@ -330,13 +331,8 @@ void handleTimer()
  */
 void setUpTimer()
 {
-	// static TimerHandle_t ninvader_timer = xTimerCreate("ninvader_timer",pdMS_TO_TICKS(100),pdTRUE,1,handleTimer);
-	// xTimerStart(ninvader_timer);
+    ninvader_timer = xTimerCreateStatic("ninvader_timer",pdMS_TO_TICKS(100/FPS),pdTRUE,(void *) 0,handleTimer,&timerbuffer);
 
-	static int timer;
-	timer = AXI_TIMER_allocate();
-	AXI_TIMER_set_handler(timer, handleTimer);
-	AXI_TIMER_set_repeating(timer,AXI_TIMER_HZ_TO_COUNT(20000));
 
 
 	// struct itimerval myTimer; 
@@ -365,8 +361,10 @@ void ninvaders_task(void *pvParameters)
 	graphicEngineInit();			// initialize graphic engine
 	
 	// set up timer/ game handling
-	setUpTimer();		
+	setUpTimer();	
+	xTimerStart(ninvader_timer, portMAX_DELAY);	
 	status = GAME_HIGHSCORE;
+	ANSI_hideCursor(0);
 
 	// read keyboard input
 	do {

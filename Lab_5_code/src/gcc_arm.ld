@@ -10,9 +10,11 @@ __STACK_SIZE = 0x00000400;
 
 /* FreeRTOS allocates the heap in .bss or .data, so no space is
    required here but we may want to check memory usage. */
-__HEAP_SIZE = 0x00010000;
-   
+__HEAP_BASE = 0x80000000;
+__HEAP_SIZE = 0x08000000;
+__HEAP_TOP  = 0x88000000;
 
+  
 
 
 
@@ -20,6 +22,7 @@ MEMORY
 {
   ROM   (rx)  : ORIGIN = __ROM_BASE, LENGTH = __ROM_SIZE
   RAM   (rwx) : ORIGIN = __RAM_BASE, LENGTH = __RAM_SIZE
+  HEAP  (rwx) : ORIGIN = __HEAP_BASE, LENGTH = __HEAP_SIZE
 }
 
 
