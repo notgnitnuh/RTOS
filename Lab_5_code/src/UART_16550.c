@@ -323,7 +323,7 @@ void UART1_handler()
 void UART_16550_init()
 {
   // Create the stream buffers and mutexes.
-#ifdef UART_16550_USE_STATIC_ALLOCATION
+  #ifdef UART_16550_USE_STATIC_ALLOCATION
   // If you want to use static allocation, then declare the buffer
   // storage, buffer structs. They are static, so the compiler will
   // put them in the .data or .bss section.
