@@ -3,6 +3,7 @@
     "cmake.buildDirectory": "${workspaceFolder}",
     "files.associations": {
         "cstdint": "c",
-        "uart_16550.h": "c"
+        "uart_16550.h": "c",
+        "stream_buffer.h": "c"
     }
 }

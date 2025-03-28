@@ -2,6 +2,7 @@
 #include <device_addrs.h>
 #include <semphr.h>
 #include <task.h>
+#include <stream_buffer.h>
 
 typedef struct{
     volatile unsigned OE:1;
@@ -29,9 +30,6 @@ typedef struct{
   pulse_modulator_t *dev; // Base address of the pulse modulator
   TaskHandle_t owner;     // The owner task handle
   void (*handler)();      // A pointrer to the channel's ISR handler
-  
-  // unsigned interrupt_number;    // NVIC IRQ number for this channel
-  // SemaphoreHandle_t PM_mutex;   // Recursive mutex for this channel
 }pulse_modulator_descriptor_t;
 
 static pulse_modulator_descriptor_t PM[] = {
@@ -46,7 +44,7 @@ static SemaphoreHandle_t PM_mutex = xSemaphoreCreateRecursiveMutex();
 
 // Get exclusive access to the pulse modulator channel.
 BaseType_t PM_acquire(int channel){
-  if(xSemaphoreTakeRecursive(PM_mutex)){
+  if(xSemaphoreTakeRecursive(PM_mutex, 0)){
     // See if PM is already owned
     if(PM[channel].owner == NULL){
       // If not owned, assign to current task
@@ -67,7 +65,7 @@ void PM_release(int channel){
 
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
   
-  if(xSemaphoreTakeRecursive(PM_mutex) ){
+  if(xSemaphoreTakeRecursive(PM_mutex,0) ){
     PM_disable(channel);
     PM[channel].owner = NULL;
     xSemaphoreGiveRecursive(PM_mutex);
@@ -87,21 +85,29 @@ void PM_set_handler(int channel, void (*handler)(void)){
 // Set the base frequency and number of divisions for the
 // channel.
 void PM_set_cycle_time(int channel, int divisions, int base_frequency){
+  ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
+  // TODO: what does any of this mean?
+  unsigned clkdiv = PM_CLOCK/(divisions * base_frequency) - 1;
+
+  ASSERT(clkdiv < (1<<16))
+
+  PM[channel].dev->CDR = clkdiv;
+  PM[channel].dev->BCR = base_frequency & 0xFFFF;
 }
 
 // Put the channel in PDM mode.
 void PM_set_PDM_mode(int channel){
 
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
-  PM[channel].CSR.PDMM = 1;
+  PM[channel].dev->CSR.PDMM = 1;
 }
 
 // Put the channel in PWM mode.
 void PM_set_PWM_mode(int channel){
 
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
-  PM[channel].CSR.PDMM = 0;
+  PM[channel].dev->CSR.PDMM = 0;
 }
 
 // Enable the FIFO. Return zero if the handler, cycle time, or
@@ -110,10 +116,10 @@ int PM_enable_FIFO(int channel){
 
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
-  PM[channel].CSR.SLFM = 1;
+  PM[channel].dev->CSR.SLFM = 1;
 
-  // TODO: return 0 if handler, cycle time, or mode not set
-  // if(PM[channel].handler == NULL || PM[channel].)
+  if(PM[channel].handler == NULL || PM[channel].dev->BCR == 0 || PM[channel].dev->CSR.PDMM == undefined)
+    return 0;
 
   return 1;
 }
@@ -121,43 +127,51 @@ int PM_enable_FIFO(int channel){
 // Disable the FIFO.
 void PM_disable_FIFO(int channel){
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
-  PM[channel].CSR.SLFM = 0;
+  PM[channel].dev->CSR.SLFM = 0;
 }
 
 // Enable output on the channel. Return zero if the channel is
 // not fully configured.
 int PM_enable(int channel){
+  ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
+  // TODO: check if fully configured
+  if (PM[channel].dev->CSR.SLFM == 0){
+    return 0;
+  }
+  PM[channel].dev->CSR.OE = 1;
+
   return 1;
 }
 
 // Disable output on the channel.
 void PM_disable(int channel){
-
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
-  PM[channel].CSR.OE = 0;
+
+  PM[channel].dev->CSR.OE = 0;
 }
 
 // Enable interrupts on the channel.
 int PM_enable_interrupt(int channel){
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
-  PM[channel].CSR.IE = 1;
-
+  PM[channel].dev->CSR.IE = 1;
   return 0;
 }
 
 // Disable interrupts on the channel.
 void PM_disable_interrupt(int channel){
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
-  PM[channel].CSR.IE = 0;
 
+  PM[channel].dev->CSR.IE = 0;
 }
 
 // Set the duty cycle for the channel. If the channel is in
 // FIFO mode, this function writes to the FIFO. Otherwise,
 // it writes directly to the Duty Cycle Register.
 void PM_set_duty(int channel,int duty){
+  ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
+  PM[channel].dev->DCR = duty;
 }
 
 // If the channel is in FIFO mode, this function returns 1 if
@@ -166,7 +180,7 @@ int PM_FIFO_full(int channel){
   int result = 0;
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
-  if(PM[channel].CSR.SLRM == 1 && PM[channel].CSR.FF)
+  if(PM[channel].dev->CSR.SLFM == 1 && PM[channel].dev->CSR.FF)
     result =  1;
 
   return result;
