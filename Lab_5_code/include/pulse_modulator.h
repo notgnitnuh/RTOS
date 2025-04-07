@@ -3,7 +3,9 @@
 
 #include <FreeRTOS.h>
 
-#define PM_CLOCK 150000000
+#define PM_CLOCK 150000000 //150,000,000
+#define NUM_PM_CHANNELS 6
+
 
 // Get exclusive access to the pulse modulator channel.
 BaseType_t PM_acquire(int channel);

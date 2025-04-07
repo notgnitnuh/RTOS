@@ -32,8 +32,8 @@ int main( void )
   UART_16550_configure(UART1,115200,UART_PARITY_NONE,8,1);
 
   /* Create the task without using any dynamic memory allocation. */
-  firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,
-				   NULL,3,firework_stack,&firework_TCB);
+  // firework_handle = xTaskCreateStatic(firework_task,"firework",FIREWORK_STACK_SIZE,
+	// 			   NULL,3,firework_stack,&firework_TCB);
   // nInvaders_handle = xTaskCreateStatic(ninvaders_task, "ninvaders", NINVADERS_STACK_SIZE,
   //           NULL,3,nInvaders_stack,&nInvaders_TCB);
         
@@ -46,8 +46,8 @@ int main( void )
   // stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
 	// 			   NULL,2,stats_stack,&stats_TCB);
 
-  // PM_test_handle = xTaskCreateStatic(PM_test_task, "PM_test", PM_TEST_STACK_SIZE,
-  //          NULL,3,PM_test_stack,&PM_test_TCB);			  
+  PM_test_handle = xTaskCreateStatic(PM_test_task, "PM_test", PM_TEST_STACK_SIZE,
+           NULL,3,PM_test_stack,&PM_test_TCB);			  
 
   /* start the scheduler */
   vTaskStartScheduler();

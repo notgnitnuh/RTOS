@@ -6,6 +6,7 @@
 // "screen /dev/ttyUSB1 9600"
 
 void PM_test_task(void *pvParameters);
+void PM_test_task_handler(void *pvParameters);
 
 /* Dimensions the buffer that the task being created will use as its
 stack. NOTE: This is the number of words the stack will hold, not the

@@ -2,20 +2,64 @@
 #include <PM_test_task.h>
 #include <task.h>
 #include <UART_16550.h>
+#include <pulse_modulator.h>
 #include <stdio.h>
 
 // "screen /dev/ttyUSB1 9600"
 
 void PM_test_task(void *pvParameters){
+  long long int val = 0;
+  unsigned basefrequency = 30000;
+  unsigned divisions = 1000;
+  unsigned dutyCycle = 75;
 
   TickType_t lastwake = xTaskGetTickCount();
   
+
+  PM_acquire(0);
+  PM_set_handler(0, PM_test_task_handler);
+  PM_enable_FIFO(0);
+  PM_set_cycle_time(0,divisions,basefrequency);
+  PM_set_duty(0,divisions/100*dutyCycle);
+  PM_set_PWM_mode(0);
+  PM_enable_interrupt(0);
+  PM_enable(0);
+
+  PM_acquire(1);
+  PM_set_handler(1, PM_test_task_handler);
+  PM_enable_FIFO(1);
+  PM_set_cycle_time(1,divisions,basefrequency);
+  PM_set_duty(1,divisions/100*dutyCycle);
+  PM_set_PWM_mode(1);
+  PM_enable_interrupt(1);
+  PM_enable(1);
+
+  PM_acquire(2);
+  PM_set_handler(2, PM_test_task_handler);
+  PM_enable_FIFO(2);
+  PM_set_cycle_time(2,divisions,basefrequency);
+  PM_set_duty(2,divisions/100*dutyCycle);
+  PM_set_PDM_mode(2);
+  PM_enable_interrupt(2);
+  PM_enable(2);
+
+  unsigned clkdiv = (PM_CLOCK/(divisions * basefrequency)) - 1;
+  unsigned baseclk = PM_CLOCK / (clkdiv + 1);
+  unsigned BCR = baseclk / basefrequency - 1;
+
   char buffer[64];
+  sprintf(buffer, "divisions: %d, base freq %d, CDR: %d, BCR: %d\r\n", divisions, basefrequency, clkdiv, BCR);
+  UART_16550_write_string(UART0,buffer,portMAX_DELAY);
   while(1){
     vTaskDelayUntil(&lastwake,1000);
-    sprintf(buffer, "It's working!\r\n");
+    sprintf(buffer, " %d\r", val);
     UART_16550_write_string(UART0,buffer,portMAX_DELAY);
+    val += 1;
   }
+
+}
+
+void PM_test_task_handler(void *pvParameters){
 
 }
 
