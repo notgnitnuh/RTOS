@@ -19,6 +19,7 @@ int main( void )
   TaskHandle_t firework_handle = NULL;
   TaskHandle_t nInvaders_handle = NULL;
   TaskHandle_t PM_test_handle = NULL;
+  TaskHandle_t sound_effects_handle = NULL;
 
 
   NVIC_SetPriority(UART0_IRQ,0x6); // priority for UART
