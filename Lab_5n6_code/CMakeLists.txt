@@ -83,6 +83,7 @@ add_compile_options(-g)
 
 # List of directories containing header files.
 include_directories( 
+  ${CMAKE_SOURCE_DIR}/sound_effects
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/include
   ${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3
@@ -101,6 +102,7 @@ file(GLOB FREERTOS_SOURCES
    "${CMAKE_SOURCE_DIR}/FreeRTOS/queue.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/mutex.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/timers.c"
+   "${CMAKE_SOURCE_DIR}/FreeRTOS/event_groups.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/stream_buffer.c"
    "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM3/port.c"
   #  "${CMAKE_SOURCE_DIR}/FreeRTOS/portable/MemMang/heap_3.c"
@@ -118,6 +120,8 @@ file(GLOB PDCURSES_SOURCES
 
 # Sources for the executable
 file(GLOB SOURCES
+  "${CMAKE_SOURCE_DIR}/sound_effects/sounds.c"
+  "${CMAKE_SOURCE_DIR}/sound_effects/sound_effects.c"
   "${CMAKE_SOURCE_DIR}/src/main.c"
   "${CMAKE_SOURCE_DIR}/src/hello_task.c"
   "${CMAKE_SOURCE_DIR}/src/stats_task.c"

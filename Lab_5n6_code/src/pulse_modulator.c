@@ -130,8 +130,8 @@ int PM_enable_FIFO(int channel){
   PM[channel].dev->CSR.SLFM = 1;
 
   // TODO: how check?
-  // if(PM[channel].handler == NULL || PM[channel].dev->BCR == 0 || PM[channel].dev->CSR.PDMM == undefined)
-  //   return 0;
+  if(PM[channel].handler == NULL || PM[channel].dev->BCR == 0)// || PM[channel].dev->CSR.PDMM == undefined)
+    return 0;
 
   return 1;
 }

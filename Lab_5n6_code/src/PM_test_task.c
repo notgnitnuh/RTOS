@@ -14,8 +14,8 @@ void PM_test_task(void *pvParameters){
   unsigned dutyCycle = 75;
 
   TickType_t lastwake = xTaskGetTickCount();
-  
 
+  // Set up channel 0 (Audio Jack)
   PM_acquire(0);
   PM_set_handler(0, PM_test_task_handler);
   PM_enable_FIFO(0);
@@ -25,6 +25,7 @@ void PM_test_task(void *pvParameters){
   PM_enable_interrupt(0);
   PM_enable(0);
 
+  // Set up channel 1
   PM_acquire(1);
   PM_set_handler(1, PM_test_task_handler);
   PM_enable_FIFO(1);
@@ -34,6 +35,7 @@ void PM_test_task(void *pvParameters){
   PM_enable_interrupt(1);
   PM_enable(1);
 
+  // Set up channel 2
   PM_acquire(2);
   PM_set_handler(2, PM_test_task_handler);
   PM_enable_FIFO(2);
@@ -56,7 +58,6 @@ void PM_test_task(void *pvParameters){
     UART_16550_write_string(UART0,buffer,portMAX_DELAY);
     val += 1;
   }
-
 }
 
 void PM_test_task_handler(void *pvParameters){
