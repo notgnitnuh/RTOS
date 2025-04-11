@@ -6,6 +6,8 @@
 #define PM_CLOCK 150000000 //150,000,000
 #define NUM_PM_CHANNELS 6
 
+#define M_PI 3.14
+
 
 // Get exclusive access to the pulse modulator channel.
 BaseType_t PM_acquire(int channel);

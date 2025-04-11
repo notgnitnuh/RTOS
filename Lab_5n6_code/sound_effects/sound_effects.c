@@ -129,6 +129,15 @@ static TaskHandle_t mixer_task_handle;
 static StackType_t  mixer_stack[MIXER_STACK_SIZE];
 static StaticTask_t mixer_TCB;
 
+// declare storage for the effect tasks TODO: verify reasonability
+#define EFFECT_STACK_SIZE 512
+static TaskHandle_t effect_handles[NUM_EFFECTS];
+static StackType_t effect_stacks[NUM_EFFECTS][EFFECT_STACK_SIZE];
+static StaticTask_t effect_TCB[NUM_EFFECTS];
+const char** effect_name = {"explosion1","fastinvader1","fastinvader2","fastinvader3","fastinvader4",
+                            "invaderkilled","shoot","ufo_highpitch","ufo_lowpitch"};
+
+
 // define storage for the ISR to Mixer and Mixer to ISR queues
 static StaticQueue_t MixerToISRqueue_QCB, ISRToMixerqueue_QCB;
 static uint16_t *MixerToISRqueue_buf[NUM_MIXER_BUFFERS];
@@ -142,14 +151,29 @@ void effect_init() // main should call this function to set up the sound effects
   // create all of the queues that will be used by the effects tasks
   // to send data to the mixer. Store their handles in the
   // effect_to_mixer_queues array
+  effect_to_mixer_queues[0] = xQueueCreate(NUM_explosion1_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[1] = xQueueCreate(NUM_fastinvader1_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[2] = xQueueCreate(NUM_fastinvader2_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[3] = xQueueCreate(NUM_fastinvader3_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[4] = xQueueCreate(NUM_fastinvader4_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[5] = xQueueCreate(NUM_invaderkilled_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[6] = xQueueCreate(NUM_shoot_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[7] = xQueueCreate(NUM_ufo_highpitch_BUFFERS, EFFECT_BUFFER_SIZE);
+  effect_to_mixer_queues[8] = xQueueCreate(NUM_ufo_lowpitch_BUFFERS, EFFECT_BUFFER_SIZE);
 
   // create the two queues to communicate between the mixer and the ISR
+  // TODO: check creation parameters
+  MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, MixerToISRqueue_buf, &MixerToISRqueue_QCB);
+  ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
   
   // create all of the effect tasks, giving them each a unique queue handle and
   // other parameters (effect_params)
+  for(int i=0; i<NUM_EFFECTS; i++)
+    effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE, 
+    &effect_task_params[i], 2, effect_stacks[i], &effect_TCB[i]);
+
 
   // create the mixer task
+  mixer_task_handle = xTaskCreateStatic(effect_mixer_task, "mixer task", MIXER_STACK_SIZE,
+    NULL,3,mixer_stack,&mixer_TCB);	
 }
-
-
-

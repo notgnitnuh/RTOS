@@ -333,8 +333,6 @@ void setUpTimer()
 {
     ninvader_timer = xTimerCreateStatic("ninvader_timer",pdMS_TO_TICKS(100/FPS),pdTRUE,(void *) 0,handleTimer,&timerbuffer);
 
-
-
 	// struct itimerval myTimer; 
 	// struct sigaction myAction;
 	// myTimer.it_value.tv_sec = 0;

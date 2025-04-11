@@ -5,5 +5,6 @@
         "cstdint": "c",
         "uart_16550.h": "c",
         "stream_buffer.h": "c"
-    }
+    },
+    "cmake.sourceDirectory": "/home/student/s7471080/Desktop/RTOS/Lab_1_code"
 }

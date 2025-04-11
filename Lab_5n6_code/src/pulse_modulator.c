@@ -195,12 +195,11 @@ void PM_set_duty(int channel,int duty){
 // If the channel is in FIFO mode, this function returns 1 if
 // the FIFO is full. In all other cases, it returns zero.
 int PM_FIFO_full(int channel){
-  int result = 0;
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
   if(PM[channel].dev->CSR.SLFM == 1 && PM[channel].dev->CSR.FF)
-    result =  1;
+    return 1;
 
-  return result;
+  return 0;
 }
