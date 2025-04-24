@@ -15,6 +15,9 @@ BaseType_t PM_acquire(int channel);
 // Release the channel. This function also disables the channel.
 void PM_release(int channel);
 
+// Look for pending interrupts and call their appropriate handler
+void PM_handler();
+
 // Set the interrupt handler function for the channel.
 void PM_set_handler(int channel, void (*handler)(void));
 

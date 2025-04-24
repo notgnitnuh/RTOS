@@ -29,7 +29,7 @@ typedef volatile struct{
 typedef struct{
   pulse_modulator_t *dev; // Base address of the pulse modulator
   TaskHandle_t owner;     // The owner task handle
-  void (*handler)();      // A pointrer to the channel's ISR handler
+  void (*handler)();      // A pointer to the channel's ISR handler
 }pulse_modulator_descriptor_t;
 
 static pulse_modulator_descriptor_t PM[] = {
@@ -41,12 +41,13 @@ static pulse_modulator_descriptor_t PM[] = {
 };
 
 static StaticSemaphore_t PM_mutex_buffer;
-static SemaphoreHandle_t PM_mutex = NULL;// = xSemaphoreCreateRecursiveMutexStatic(&PM_mutex_buffer);
+static SemaphoreHandle_t PM_mutex = NULL;
 
 // Get exclusive access to the pulse modulator channel.
 BaseType_t PM_acquire(int channel){
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
 
+  // Create the mutex if it is null
   if(PM_mutex == NULL)
     PM_mutex = xSemaphoreCreateRecursiveMutexStatic(&PM_mutex_buffer);
 
@@ -55,6 +56,7 @@ BaseType_t PM_acquire(int channel){
     if(PM[channel].owner == NULL){
       // If not owned, assign to current task
       PM[channel].owner = xTaskGetCurrentTaskHandle();
+      PM[channel].dev->CSR.FIL = 1;
       xSemaphoreGiveRecursive(PM_mutex);
       return pdPASS;
     }
@@ -78,6 +80,20 @@ void PM_release(int channel){
     xSemaphoreGiveRecursive(PM_mutex);
   }
   
+}
+
+// Look for pending interrupts and call their appropriate handler
+void PM_handler(){
+  BaseType_t hptw=0;
+
+  for(int i=0 ; i<NUM_PM_CHANNELS; i++){
+    if(PM[i].dev->CSR.IA == 1)
+      PM[i].handler();
+  }
+
+  NVIC_ClearPendingIRQ(PM_IRQ);
+
+  return hptw;
 }
 
 // Set the interrupt handler function for the channel.
@@ -170,6 +186,7 @@ int PM_enable_interrupt(int channel){
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
+  NVIC_EnableIRQ(PM_IRQ);
   PM[channel].dev->CSR.IE = 1;
   return 0;
 }
