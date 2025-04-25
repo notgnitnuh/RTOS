@@ -45,7 +45,6 @@ static effect_param_t effect_task_params[NUM_EFFECTS] = {
   {ufo_lowpitch,NUM_ufo_lowpitch_BUFFERS,UFO_LOWPITCH_EVENT,NULL}
 };
 
-
 // The interrupt handler for the audio pulse modulator
 void audio_handler(BaseType_t *HPTW)
 {
@@ -54,9 +53,9 @@ void audio_handler(BaseType_t *HPTW)
   // may need more static variables here
 
   // if buffer == null, then get a buffer from the queue.
-  if (buffer == NULL){
-    buffer = xQueueReceiveFromISR(MixerToISRqueue, &MixerToISRqueue, &HPTW);
-  }
+  // if (buffer == NULL){
+  //   buffer = xQueueReceiveFromISR(MixerToISRqueue, &MixerToISRqueue, &HPTW);
+  // }
 
   // While the PM FIFO is not full,
   //   Transfer a data item from the buffer to the FIFO
@@ -88,8 +87,8 @@ static uint16_t mixer_buffers[NUM_MIXER_BUFFERS][EFFECT_BUFFER_SIZE];
 static void effect_mixer_task(void *params)
 {
   uint16_t *buffer;
-  unsigned basefrequency = 8000;
-  unsigned divisions = 4095;
+  unsigned basefrequency = 146484;
+  unsigned divisions = 1024;
 
   // Initialization:
 
@@ -100,27 +99,27 @@ static void effect_mixer_task(void *params)
   PM_acquire(0);
   PM_set_handler(0, audio_handler);
   PM_set_cycle_time(0,divisions,basefrequency);
-  // PM_set_duty(0,divisions/100*dutyCycle);
+  PM_set_duty(0,0);
   PM_set_PDM_mode(0);
   PM_enable_FIFO(0);
   PM_enable_interrupt(0);
   PM_enable(0);
 
   while (1)
-    {
-      // Part 1:
-      // Pick one of the sound effects.  For each chunk of data in the sound effect:
-      //   Get a mixer buffer pointer from the ISR to mixer queue
-      //   Copy (making adjustments) the data from the sound effect into it.
-      //   Send the mixer buffer pointer to the mixer to ISR queue
-      xQueueSend(MixerToISRqueue, effect_to_mixer_queues[0], 100);
+  {
+    // Part 1:
+    // Pick one of the sound effects.  For each chunk of data in the sound effect:
+    //   Get a mixer buffer pointer from the ISR to mixer queue
+    //   Copy (making adjustments) the data from the sound effect into it.
+    //   Send the mixer buffer pointer to the mixer to ISR queue
+    // xQueueSend(MixerToISRqueue, effect_to_mixer_queues[0], 100);
 
-      // Part 2: (comment out part 1)
-      //   Get a mixer buffer pointer from the ISR to mixer queue
-      //   Get incoming data pointers from all of the sound effects queues.
-      //   Add all of the incoming data streams and store the results in the mixer buffer. 
-      //   Send the mixer buffer pointer to the mixer to ISR queue
-    }
+    // Part 2: (comment out part 1)
+    //   Get a mixer buffer pointer from the ISR to mixer queue
+    //   Get incoming data pointers from all of the sound effects queues.
+    //   Add all of the incoming data streams and store the results in the mixer buffer. 
+    //   Send the mixer buffer pointer to the mixer to ISR queue
+  }
 }
 
 
@@ -186,13 +185,13 @@ void effect_init() // main should call this function to set up the sound effects
   effect_to_mixer_queues[7] = xQueueCreate(NUM_ufo_highpitch_BUFFERS, EFFECT_BUFFER_SIZE);
   effect_to_mixer_queues[8] = xQueueCreate(NUM_ufo_lowpitch_BUFFERS, EFFECT_BUFFER_SIZE);
 
-  // create the two queues to communicate between the mixer and the ISR
-  // TODO: check creation parameters
+  // // create the two queues to communicate between the mixer and the ISR
+  // // TODO: check creation parameters
   MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, MixerToISRqueue_buf, &MixerToISRqueue_QCB);
   ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
   
-  // create all of the effect tasks, giving them each a unique queue handle and
-  // other parameters (effect_params)
+  // // create all of the effect tasks, giving them each a unique queue handle and
+  // // other parameters (effect_params)
   for(i=0; i<NUM_EFFECTS; i++){
     effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE, 
                         &effect_task_params[i], 2, effect_stacks[i], &effect_TCB[i]);

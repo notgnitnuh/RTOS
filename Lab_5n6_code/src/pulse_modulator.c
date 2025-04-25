@@ -97,7 +97,7 @@ void PM_handler(){
 }
 
 // Set the interrupt handler function for the channel.
-void PM_set_handler(int channel, void (*handler)(void)){
+void PM_set_handler(int channel, void (*handler)(BaseType_t *)){
 
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
   ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())

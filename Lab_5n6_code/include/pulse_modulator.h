@@ -19,7 +19,7 @@ void PM_release(int channel);
 void PM_handler();
 
 // Set the interrupt handler function for the channel.
-void PM_set_handler(int channel, void (*handler)(void));
+void PM_set_handler(int channel, void (*handler)(BaseType_t *));
 
 // Set the base frequency and number of divisions for the
 // channel.

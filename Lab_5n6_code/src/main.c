@@ -2,12 +2,13 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <UART_16550.h>
-#include <PM_test_task.h>
+// #include <PM_test_task.h>
 #include <hello_task.h>
 #include <stats_task.h>
 #include <firework_task.h>
 #include <device_addrs.h>
 #include <nInvaders.h>
+#include <sound_effects.h>
 
 // "screen /dev/ttyUSB1 9600"
 
@@ -19,7 +20,6 @@ int main( void )
   TaskHandle_t firework_handle = NULL;
   TaskHandle_t nInvaders_handle = NULL;
   TaskHandle_t PM_test_handle = NULL;
-  TaskHandle_t sound_effects_handle = NULL;
 
 
   NVIC_SetPriority(UART0_IRQ,0x6); // priority for UART
@@ -47,8 +47,12 @@ int main( void )
   // stats_handle = xTaskCreateStatic(stats_task,"stats",STATS_STACK_SIZE,
 	// 			   NULL,2,stats_stack,&stats_TCB);
 
-  PM_test_handle = xTaskCreateStatic(PM_test_task, "PM_test", PM_TEST_STACK_SIZE,
-           NULL,3,PM_test_stack,&PM_test_TCB);			  
+  // PM_test_handle = xTaskCreateStatic(PM_test_task, "PM_test", PM_TEST_STACK_SIZE,
+  //          NULL,2,PM_test_stack,&PM_test_TCB);		
+  	  
+  // sound_effects_handle = xTaskCreateStatic(effect_mixer_task, "effect_mixer", PM_TEST_STACK_SIZE,
+  //          NULL,2,PM_test_stack,&PM_test_TCB);		
+  effect_init();
 
   /* start the scheduler */
   vTaskStartScheduler();
