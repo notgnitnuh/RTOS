@@ -2,7 +2,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <UART_16550.h>
-// #include <PM_test_task.h>
+#include <PM_test_task.h>
 #include <hello_task.h>
 #include <stats_task.h>
 #include <firework_task.h>

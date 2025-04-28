@@ -48,28 +48,44 @@ static effect_param_t effect_task_params[NUM_EFFECTS] = {
 // The interrupt handler for the audio pulse modulator
 void audio_handler(BaseType_t *HPTW)
 {
+  static unsigned int val, t1, t2 = 0;
+
   static uint16_t *buffer = NULL; // make it static so that it always exists.
+  static BaseType_t validBuffer = pdFAIL;
+  static int test = 100;
 
-  // may need more static variables here
+  // // may need more static variables here
 
-  // if buffer == null, then get a buffer from the queue.
+  // // if buffer == null, then get a buffer from the queue.
   // if (buffer == NULL){
-  //   buffer = xQueueReceiveFromISR(MixerToISRqueue, &MixerToISRqueue, &HPTW);
+  //   validBuffer = xQueueReceiveFromISR(MixerToISRqueue, buffer, &HPTW);
   // }
 
-  // While the PM FIFO is not full,
-  //   Transfer a data item from the buffer to the FIFO
-  while(PM_FIFO_full(0) == 0){
+  // // While the PM FIFO is not full,
+  // //   Transfer a data item from the buffer to the FIFO
+  while(PM_FIFO_full(CHANNEL) == 0){
+
     //   You may not have a valid buffer (the mixer may not
     //   have run yet) In that case, write a zero .
-
+    if(validBuffer == pdPASS){
+      PM_set_duty(CHANNEL,buffer[0]);
+    }
+    else{ //TODO: set to zero instead of shoot
+      if(t1 >= NUM_shoot_BUFFERS)
+        t1=0;
+      if(t2 >= EFFECT_BUFFER_SIZE){
+        t2=0;
+        t1++;
+      }
+      PM_set_duty(CHANNEL, shoot[t1].data[t2]);
+      t2++;
+    }
   
     //   If you send the last item in your current buffer, then send the
     //   pointer back to the mixer and get another buffer from the
     //   mixer.
 
   }
-  
 }
 
 
@@ -87,23 +103,29 @@ static uint16_t mixer_buffers[NUM_MIXER_BUFFERS][EFFECT_BUFFER_SIZE];
 static void effect_mixer_task(void *params)
 {
   uint16_t *buffer;
-  unsigned basefrequency = 146484;
-  unsigned divisions = 1024;
+  // unsigned basefrequency = 146484;
+  unsigned basefrequency = FREQ;
+  unsigned divisions = 2;
+  for(int i=1; i<DEPTH; i++)
+    divisions = divisions * 2;
 
   // Initialization:
+  static int t1, t2= 0;
 
   // Put the pointers to the NUM_MIXER_BUFFERS mixer_buffers in the PM_to_mixer queue
+  for(int i=0; i<NUM_MIXER_BUFFERS; i++){
+    xQueueSendToFront(ISRToMixerqueue, &mixer_buffers[i], 10);
+  }
   
   // configure and enable the pulse modulator
-  // Set up channel 0 (Audio Jack)
-  PM_acquire(0);
-  PM_set_handler(0, audio_handler);
-  PM_set_cycle_time(0,divisions,basefrequency);
-  PM_set_duty(0,0);
-  PM_set_PDM_mode(0);
-  PM_enable_FIFO(0);
-  PM_enable_interrupt(0);
-  PM_enable(0);
+  PM_acquire(CHANNEL);
+  PM_set_handler(CHANNEL, audio_handler);
+  PM_set_cycle_time(CHANNEL,divisions,basefrequency);
+  PM_set_duty(CHANNEL,0);
+  PM_set_PWM_mode(CHANNEL);
+  PM_enable_FIFO(CHANNEL);
+  PM_enable(CHANNEL);
+  PM_enable_interrupt(CHANNEL);
 
   while (1)
   {
@@ -112,7 +134,15 @@ static void effect_mixer_task(void *params)
     //   Get a mixer buffer pointer from the ISR to mixer queue
     //   Copy (making adjustments) the data from the sound effect into it.
     //   Send the mixer buffer pointer to the mixer to ISR queue
-    // xQueueSend(MixerToISRqueue, effect_to_mixer_queues[0], 100);
+    // xQueueSendToFront(MixerToISRqueue, effect_to_mixer_queues[0], 100);
+    // for(t1=0;t1<NUM_shoot_BUFFERS; t1++){
+    //   // for(t2=0;t2<EFFECT_BUFFER_SIZE; t2++){
+    //     // buffer = &shoot[t1].data;
+    //     // xQueueSendToFront(MixerToISRqueue, buffer, 10);
+    //   // }
+    // }
+    // vTaskDelay(pdMS_TO_TICKS( 1 ));
+
 
     // Part 2: (comment out part 1)
     //   Get a mixer buffer pointer from the ISR to mixer queue
@@ -134,15 +164,15 @@ static void effect_task(void *params)
   while(1)
   {
     // Block until my event occurs.
-    uxBits = xEventGroupWaitBits(effect_events, my_effect->event, pdTRUE, pdFALSE, 100);
+    // uxBits = xEventGroupWaitBits(effect_events, my_effect->event, pdTRUE, pdFALSE, 100);
     // loop:
     //   send pointers to my buffers to my send queue
     //   until I have sent all of my buffers.
-    if(uxBits & my_effect->event == my_effect->event){
-      for(int i=0; i<my_effect->num_buffers; i++){
-        xQueueSendToBack(my_effect->sendqueue, &my_effect->buffers[i],10);
-      }
-    }
+    // if(uxBits & my_effect->event == my_effect->event){
+    //   for(int i=0; i<my_effect->num_buffers; i++){
+    //     xQueueSendToBack(my_effect->sendqueue, &my_effect->buffers[i],10);
+    //   }
+    // }
   }
 }
 
@@ -185,19 +215,18 @@ void effect_init() // main should call this function to set up the sound effects
   effect_to_mixer_queues[7] = xQueueCreate(NUM_ufo_highpitch_BUFFERS, EFFECT_BUFFER_SIZE);
   effect_to_mixer_queues[8] = xQueueCreate(NUM_ufo_lowpitch_BUFFERS, EFFECT_BUFFER_SIZE);
 
-  // // create the two queues to communicate between the mixer and the ISR
-  // // TODO: check creation parameters
-  MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, MixerToISRqueue_buf, &MixerToISRqueue_QCB);
-  ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,EFFECT_BUFFER_SIZE, ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
+  // create the two queues to communicate between the mixer and the ISR
+  MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,16, (uint8_t*)MixerToISRqueue_buf, &MixerToISRqueue_QCB);
+  ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,16, (uint8_t*)ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
   
-  // // create all of the effect tasks, giving them each a unique queue handle and
-  // // other parameters (effect_params)
-  for(i=0; i<NUM_EFFECTS; i++){
-    effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE, 
+  // create all of the effect tasks, giving them each a unique queue handle and
+  // other parameters (effect_params)
+  for(i=0; i<NUM_EFFECTS; i++){  
+    effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE,
                         &effect_task_params[i], 2, effect_stacks[i], &effect_TCB[i]);
   }
 
   // create the mixer task
-  mixer_task_handle = xTaskCreateStatic(effect_mixer_task, "mixer task", MIXER_STACK_SIZE,
+  mixer_task_handle = xTaskCreateStatic(effect_mixer_task, "mixer task", MIXER_STACK_SIZE, 
     NULL,3,mixer_stack,&mixer_TCB);	
 }

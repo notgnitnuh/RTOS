@@ -88,12 +88,12 @@ void PM_handler(){
 
   for(int i=0 ; i<NUM_PM_CHANNELS; i++){
     if(PM[i].dev->CSR.IA == 1)
-      PM[i].handler();
+      PM[i].handler(hptw);
   }
 
   NVIC_ClearPendingIRQ(PM_IRQ);
 
-  return hptw;
+  // return hptw;
 }
 
 // Set the interrupt handler function for the channel.

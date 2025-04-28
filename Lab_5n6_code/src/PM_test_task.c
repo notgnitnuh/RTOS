@@ -33,7 +33,7 @@ void PM_test_task(void *pvParameters){
   PM_acquire(0);
   PM_set_handler(0, PM_test_task_handler);
   PM_set_cycle_time(0,divisions,basefrequency);
-  PM_set_PDM_mode(0);
+  PM_set_PWM_mode(0);
   PM_enable_FIFO(0);
   PM_enable(0);
   PM_enable_interrupt(0);
