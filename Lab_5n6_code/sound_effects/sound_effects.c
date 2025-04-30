@@ -44,46 +44,60 @@ static effect_param_t effect_task_params[NUM_EFFECTS] = {
   {ufo_highpitch,NUM_ufo_highpitch_BUFFERS,UFO_HIGHPITCH_EVENT,NULL},
   {ufo_lowpitch,NUM_ufo_lowpitch_BUFFERS,UFO_LOWPITCH_EVENT,NULL}
 };
-
+const uint16_t sineLookupTable2[] = {
+  0x200, 0x20a, 0x213, 0x21d, 0x227, 0x230, 0x23a, 0x243, 0x24d, 0x257, 0x260, 0x26a, 0x273, 0x27c, 0x286, 0x28f, 0x298, 0x2a1, 0x2ab, 0x2b4, 0x2bd, 0x2c6, 0x2ce, 0x2d7, 0x2e0, 0x2e9, 0x2f1, 0x2fa, 0x302, 0x30a,
+  0x313, 0x31b, 0x323, 0x32b, 0x332, 0x33a, 0x342, 0x349, 0x350, 0x358, 0x35f, 0x366, 0x36d, 0x373, 0x37a, 0x380, 0x387, 0x38d, 0x393, 0x399, 0x39f, 0x3a4, 0x3aa, 0x3af, 0x3b4, 0x3b9, 0x3be, 0x3c2, 0x3c7, 0x3cb,
+  0x3d0, 0x3d4, 0x3d7, 0x3db, 0x3df, 0x3e2, 0x3e5, 0x3e8, 0x3eb, 0x3ee, 0x3f0, 0x3f2, 0x3f5, 0x3f6, 0x3f8, 0x3fa, 0x3fb, 0x3fc, 0x3fd, 0x3fe, 0x3ff, 0x400, 0x400, 0x400, 0x400, 0x400, 0x3ff, 0x3ff, 0x3fe, 0x3fd,
+  0x3fc, 0x3fb, 0x3f9, 0x3f7, 0x3f6, 0x3f3, 0x3f1, 0x3ef, 0x3ec, 0x3ea, 0x3e7, 0x3e4, 0x3e0, 0x3dd, 0x3d9, 0x3d5, 0x3d2, 0x3cd, 0x3c9, 0x3c5, 0x3c0, 0x3bb, 0x3b6, 0x3b1, 0x3ac, 0x3a7, 0x3a1, 0x39c, 0x396, 0x390,
+  0x38a, 0x384, 0x37d, 0x377, 0x370, 0x369, 0x362, 0x35b, 0x354, 0x34d, 0x345, 0x33e, 0x336, 0x32f, 0x327, 0x31f, 0x317, 0x30e, 0x306, 0x2fe, 0x2f5, 0x2ed, 0x2e4, 0x2dc, 0x2d3, 0x2ca, 0x2c1, 0x2b8, 0x2af, 0x2a6,
+  0x29d, 0x294, 0x28a, 0x281, 0x278, 0x26e, 0x265, 0x25b, 0x252, 0x248, 0x23f, 0x235, 0x22b, 0x222, 0x218, 0x20e, 0x205, 0x1fb, 0x1f2, 0x1e8, 0x1de, 0x1d5, 0x1cb, 0x1c1, 0x1b8, 0x1ae, 0x1a5, 0x19b, 0x192, 0x188,
+  0x17f, 0x176, 0x16c, 0x163, 0x15a, 0x151, 0x148, 0x13f, 0x136, 0x12d, 0x124, 0x11c, 0x113, 0x10b, 0x102, 0xfa, 0xf2, 0xe9, 0xe1, 0xd9, 0xd1, 0xca, 0xc2, 0xbb, 0xb3, 0xac, 0xa5, 0x9e, 0x97, 0x90,
+  0x89, 0x83, 0x7c, 0x76, 0x70, 0x6a, 0x64, 0x5f, 0x59, 0x54, 0x4f, 0x4a, 0x45, 0x40, 0x3b, 0x37, 0x33, 0x2e, 0x2b, 0x27, 0x23, 0x20, 0x1c, 0x19, 0x16, 0x14, 0x11, 0x0f, 0x0d, 0x0a,
+  0x09, 0x07, 0x05, 0x04, 0x03, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08, 0x0a, 0x0b, 0x0e, 0x10, 0x12, 0x15, 0x18, 0x1b, 0x1e, 0x21,
+  0x25, 0x29, 0x2c, 0x30, 0x35, 0x39, 0x3e, 0x42, 0x47, 0x4c, 0x51, 0x56, 0x5c, 0x61, 0x67, 0x6d, 0x73, 0x79, 0x80, 0x86, 0x8d, 0x93, 0x9a, 0xa1, 0xa8, 0xb0, 0xb7, 0xbe, 0xc6, 0xce,
+  0xd5, 0xdd, 0xe5, 0xed, 0xf6, 0xfe, 0x106, 0x10f, 0x117, 0x120, 0x129, 0x132, 0x13a, 0x143, 0x14c, 0x155, 0x15f, 0x168, 0x171, 0x17a, 0x184, 0x18d, 0x196, 0x1a0, 0x1a9, 0x1b3, 0x1bd, 0x1c6, 0x1d0, 0x1d9,
+  0x1e3, 0x1ed, 0x1f6};
 // The interrupt handler for the audio pulse modulator
 void audio_handler(BaseType_t *HPTW)
 {
   static unsigned int val, t1, t2 = 0;
 
   static uint16_t *buffer = NULL; // make it static so that it always exists.
+  static int buff_pos = 0;
   static BaseType_t validBuffer = pdFAIL;
   static int test = 100;
 
-  // // may need more static variables here
+  // may need more static variables here
 
-  // // if buffer == null, then get a buffer from the queue.
-  // if (buffer == NULL){
-  //   validBuffer = xQueueReceiveFromISR(MixerToISRqueue, buffer, &HPTW);
-  // }
+  // if buffer == null, then get a buffer from the queue.
+  if (buffer == NULL){
+    validBuffer = xQueueReceiveFromISR(MixerToISRqueue, &buffer, HPTW);
+  }
 
-  // // While the PM FIFO is not full,
-  // //   Transfer a data item from the buffer to the FIFO
+  // While the PM FIFO is not full,
+  //   Transfer a data item from the buffer to the FIFO
   while(PM_FIFO_full(CHANNEL) == 0){
 
     //   You may not have a valid buffer (the mixer may not
     //   have run yet) In that case, write a zero .
     if(validBuffer == pdPASS){
-      PM_set_duty(CHANNEL,buffer[0]);
+      // PM_set_duty(CHANNEL,buffer[0]);
+      PM_set_duty(CHANNEL,buffer[buff_pos]);
+      buff_pos ++;
     }
     else{ //TODO: set to zero instead of shoot
-      if(t1 >= NUM_shoot_BUFFERS)
-        t1=0;
-      if(t2 >= EFFECT_BUFFER_SIZE){
-        t2=0;
-        t1++;
-      }
-      PM_set_duty(CHANNEL, shoot[t1].data[t2]);
-      t2++;
+      PM_set_duty(CHANNEL, 0);
     }
   
     //   If you send the last item in your current buffer, then send the
     //   pointer back to the mixer and get another buffer from the
     //   mixer.
+    if(buff_pos >= EFFECT_BUFFER_SIZE){
+      buff_pos = 0;
+      xQueueSendFromISR(ISRToMixerqueue, &buffer, HPTW);
+      buffer = NULL;
+      break;
+    }
 
   }
 }
@@ -103,8 +117,7 @@ static uint16_t mixer_buffers[NUM_MIXER_BUFFERS][EFFECT_BUFFER_SIZE];
 static void effect_mixer_task(void *params)
 {
   uint16_t *buffer;
-  // unsigned basefrequency = 146484;
-  unsigned basefrequency = FREQ;
+  uint16_t test = 100;
   unsigned divisions = 2;
   for(int i=1; i<DEPTH; i++)
     divisions = divisions * 2;
@@ -114,13 +127,14 @@ static void effect_mixer_task(void *params)
 
   // Put the pointers to the NUM_MIXER_BUFFERS mixer_buffers in the PM_to_mixer queue
   for(int i=0; i<NUM_MIXER_BUFFERS; i++){
-    xQueueSendToFront(ISRToMixerqueue, &mixer_buffers[i], 10);
+    buffer = (uint16_t*)mixer_buffers[i];
+    xQueueSend(ISRToMixerqueue, &buffer, portMAX_DELAY);
   }
   
   // configure and enable the pulse modulator
   PM_acquire(CHANNEL);
   PM_set_handler(CHANNEL, audio_handler);
-  PM_set_cycle_time(CHANNEL,divisions,basefrequency);
+  PM_set_cycle_time(CHANNEL,divisions,FREQ);
   PM_set_duty(CHANNEL,0);
   PM_set_PWM_mode(CHANNEL);
   PM_enable_FIFO(CHANNEL);
@@ -134,15 +148,22 @@ static void effect_mixer_task(void *params)
     //   Get a mixer buffer pointer from the ISR to mixer queue
     //   Copy (making adjustments) the data from the sound effect into it.
     //   Send the mixer buffer pointer to the mixer to ISR queue
-    // xQueueSendToFront(MixerToISRqueue, effect_to_mixer_queues[0], 100);
-    // for(t1=0;t1<NUM_shoot_BUFFERS; t1++){
-    //   // for(t2=0;t2<EFFECT_BUFFER_SIZE; t2++){
-    //     // buffer = &shoot[t1].data;
-    //     // xQueueSendToFront(MixerToISRqueue, buffer, 10);
-    //   // }
-    // }
-    // vTaskDelay(pdMS_TO_TICKS( 1 ));
+    // xQueueReceive(ISRToMixerqueue, &buffer, portMAX_DELAY);
 
+    if(xQueueReceive(ISRToMixerqueue, &buffer, portMAX_DELAY) == pdPASS){
+      if(t1 > NUM_shoot_BUFFERS){
+        t1 = 0;
+        vTaskDelay(pdMS_TO_TICKS( 500 ));
+      }
+      for(int i=0; i<EFFECT_BUFFER_SIZE; i++){
+        buffer[i] = shoot[t1].data[i];
+      }
+      if(uxQueueSpacesAvailable(MixerToISRqueue)){
+        if(xQueueSend(MixerToISRqueue, &buffer, portMAX_DELAY) != pdPASS)
+          while(1);
+        t1 += 1;
+      }
+    }
 
     // Part 2: (comment out part 1)
     //   Get a mixer buffer pointer from the ISR to mixer queue
@@ -216,15 +237,15 @@ void effect_init() // main should call this function to set up the sound effects
   effect_to_mixer_queues[8] = xQueueCreate(NUM_ufo_lowpitch_BUFFERS, EFFECT_BUFFER_SIZE);
 
   // create the two queues to communicate between the mixer and the ISR
-  MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,16, (uint8_t*)MixerToISRqueue_buf, &MixerToISRqueue_QCB);
-  ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,16, (uint8_t*)ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
+  MixerToISRqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,sizeof(uint16_t*), (uint8_t*)MixerToISRqueue_buf, &MixerToISRqueue_QCB);
+  ISRToMixerqueue = xQueueCreateStatic(NUM_MIXER_BUFFERS,sizeof(uint16_t*), (uint8_t*)ISRToMixerqueue_buf, &ISRToMixerqueue_QCB);
   
   // create all of the effect tasks, giving them each a unique queue handle and
   // other parameters (effect_params)
-  for(i=0; i<NUM_EFFECTS; i++){  
-    effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE,
-                        &effect_task_params[i], 2, effect_stacks[i], &effect_TCB[i]);
-  }
+  // for(i=0; i<NUM_EFFECTS; i++){  
+  //   effect_handles[i] = xTaskCreateStatic(effect_task, effect_name[i], EFFECT_STACK_SIZE,
+  //                       &effect_task_params[i], 2, effect_stacks[i], &effect_TCB[i]);
+  // }
 
   // create the mixer task
   mixer_task_handle = xTaskCreateStatic(effect_mixer_task, "mixer task", MIXER_STACK_SIZE, 

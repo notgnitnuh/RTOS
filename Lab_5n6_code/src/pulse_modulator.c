@@ -204,7 +204,7 @@ void PM_disable_interrupt(int channel){
 // it writes directly to the Duty Cycle Register.
 void PM_set_duty(int channel,int duty){
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
-  ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
+// ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
   PM[channel].dev->DCR = duty;
 }
@@ -213,7 +213,7 @@ void PM_set_duty(int channel,int duty){
 // the FIFO is full. In all other cases, it returns zero.
 int PM_FIFO_full(int channel){
   ASSERT(channel >= 0 && channel < NUM_PM_CHANNELS)
-  ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
+// ASSERT(PM[channel].owner == xTaskGetCurrentTaskHandle())
 
   if(PM[channel].dev->CSR.SLFM == 1 && PM[channel].dev->CSR.FF)
     return 1;
