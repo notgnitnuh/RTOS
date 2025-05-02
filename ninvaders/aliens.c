@@ -25,15 +25,18 @@
 #include "aliens.h"
 #include "player.h"
 #include "nInvaders.h"
-#include <sound_effects.h>
+
+
+
 Aliens aliens;
-int shipnum;	
 int lowest_ship[ALIENS_MAX_NUMBER_X];
 int alienshotx[ALIENS_MAX_MISSILES];
 int alienshoty[ALIENS_MAX_MISSILES];
 int alienshotnum;
 int alienBlock[ALIENS_MAX_NUMBER_Y][ALIENS_MAX_NUMBER_X];
+
 int bunker[BUNKERHEIGHT][BUNKERWIDTH + 1];	
+int shipnum;	
 
 /**
  * initialize aliens attributes
@@ -153,15 +156,6 @@ int aliensMove()
 		aliens.speed = aliens.speed * (-1);		  // change direction of aliens' movements
 	}
 
-	if(aliens.posY % 4 == 0)
-		xEventGroupSetBits(effect_events, FASTINVADER1_EVENT);
-	else if (aliens.posY % 4 == 1)
-		xEventGroupSetBits(effect_events, FASTINVADER2_EVENT);
-	else if (aliens.posY % 4 == 2)
-		xEventGroupSetBits(effect_events, FASTINVADER3_EVENT);
-	else
-		xEventGroupSetBits(effect_events, FASTINVADER4_EVENT);
-
 	aliensDisplay(aliens.posX, aliens.posY, aliens.right, aliens.bottom); // display aliens at new position
 	
 	return fReachedPlayer;				  // return if aliens reached player
@@ -238,7 +232,6 @@ int aliensMissileMove()
 			// if missile hit the bunkers	
 			if (bunkersHitCheck(alienshotx[i], alienshoty[i]) == 1) {
 				alienshotx[i] = 0;		// value of zero reloads missile
-				xEventGroupSetBits(effect_events, EXPLOSION1_EVENT);
 			}
 			
 			alienshoty[i]++;			// move missile downwards
@@ -247,7 +240,6 @@ int aliensMissileMove()
 			if (playerHitCheck(alienshotx[i], alienshoty[i]) == 1) {
 				alienshotx[i] = 0;		// value of zero reloads missile
 				fPlayerWasHit = 1;
-				xEventGroupSetBits(effect_events, EXPLOSION1_EVENT);
 			}
 			
 			
@@ -262,7 +254,6 @@ int aliensMissileMove()
 				}
 				alienshoty[i]=aliens.posY+lowest_ship[tmp];		// set y position of missile
 				alienshotx[i]=aliens.posX+tmp*3;			// set x position of missile
-				xEventGroupSetBits(effect_events, SHOOT_EVENT);
 			}
 		} // if 
 		
@@ -301,7 +292,6 @@ int aliensHitCheck(int shotx, int shoty)
 		alienType = alienBlock[shipy][shipx];
 		if (alienType != 0) {
 			alienBlock[shipy][shipx] = 0;	// delete alien ship
-			xEventGroupSetBits(effect_events, INVADERKILLED_EVENT);
 		}
 	}
 	return alienType; 	// returns 0 if no alien was hit, else returns type-code of alien

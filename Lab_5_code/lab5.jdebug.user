@@ -1,0 +1,33 @@
+
+
+
+Breakpoint=/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/src/PM_test_task.c:55:1, State=BP_STATE_ON
+OpenDocument="startup_ARMCM3.S", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/src/startup_ARMCM3.S", Line=68
+OpenDocument="PM_test_task.c", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/src/PM_test_task.c", Line=36
+OpenDocument="main.c", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/src/main.c", Line=3
+OpenDocument="ieee754-df.S", FilePath="/build/gcc-arm-none-eabi-hYfgK4/gcc-arm-none-eabi-10.3-2021.07/libgcc/config/arm/ieee754-df.S", Line=0
+OpenDocument="ANSI_terminal.c", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/PDCurses/ANSI/drivers/ANSI_terminal.c", Line=327
+OpenDocument="tasks.c", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/FreeRTOS/tasks.c", Line=4011
+OpenDocument="LDP-001_PM_driver.c", FilePath="/home/faculty/lpyeatt/courses/CENG448/Lab_5_solution/src/LDP-001_PM_driver.c", Line=47
+OpenDocument="s_sin.c", FilePath="/build/newlib-pB30de/newlib-3.3.0/newlib/libm/math/s_sin.c", Line=0
+OpenDocument="k_sin.c", FilePath="/build/newlib-pB30de/newlib-3.3.0/newlib/libm/math/k_sin.c", Line=0
+OpenToolbar="Debug", Floating=0, x=0, y=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=1, w=620, h=231, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=2, w=620, h=336, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=620, h=357, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Memory 1", DockArea=BOTTOM, x=0, y=0, w=814, h=318, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x20004710
+OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=0, w=300, h=408, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Functions", DockArea=LEFT, x=0, y=1, w=300, h=517, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Console", DockArea=BOTTOM, x=1, y=0, w=1023, h=318, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+SmartViewPlugin="", Page="", Toolbar="Hidden", Window="SmartView 1"
+TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[1372;100;100;100;203]
+TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[161;112;154;100;168;100]
+TableHeader="Power Sampling", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[100;105;399]
+TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
+TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[200;100;100;665]
+TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[100;100;100;100]
+WatchedExpression="channels", Window=Watched Data 1
+WatchedExpression="xd", Window=Watched Data 1
+WatchedExpression="x", Window=Watched Data 1
+WatchedExpression="y", Window=Watched Data 1

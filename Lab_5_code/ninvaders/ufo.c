@@ -25,9 +25,9 @@
 #include "ufo.h"
 #include "aliens.h"
 #include "nInvaders.h"
-#include <sound_effects.h>
 
 static int fShowUfo = 0;
+
 Ufo ufo;
 
 /**
@@ -76,11 +76,6 @@ int ufoShowUfo()
 {
 	if (aliens.posY > 0 && fShowUfo == 0) { // aliens one line down
 		if ((random() % 200) == 0) {
-			if(random() % 2 == 0)
-				xEventGroupSetBits(effect_events, UFO_LOWPITCH_EVENT);
-			else
-				xEventGroupSetBits(effect_events, UFO_HIGHPITCH_EVENT);
-
 			fShowUfo = 1;
 		}
 	}

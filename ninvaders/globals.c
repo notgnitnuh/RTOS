@@ -43,8 +43,8 @@
  */
 void doSleep(int microseconds)
 {
-	// napms(microseconds);
-    // usleep(microseconds);
+	// usleep(microseconds);
+	napms(microseconds);
 }
 
 
