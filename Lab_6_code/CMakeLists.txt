@@ -120,6 +120,7 @@ file(GLOB PDCURSES_SOURCES
 
 # Sources for the executable
 file(GLOB SOURCES
+  # "${CMAKE_SOURCE_DIR}/sound_effects/theme.c"
   "${CMAKE_SOURCE_DIR}/sound_effects/sounds.c"
   "${CMAKE_SOURCE_DIR}/sound_effects/sound_effects.c"
   "${CMAKE_SOURCE_DIR}/src/main.c"

@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <queue.h>
 #include <pulse_modulator.h>
+// #include <theme.h>
 
 #define CHANNEL 0
 
@@ -98,9 +99,7 @@ static void effect_mixer_task(void *params)
   // Initialization:
   uint16_t *buffer;
   int8_t *buffer2;
-  // unsigned divisions = 2;
-  // for(int i=1; i<DEPTH; i++)
-  //   divisions = divisions * 2;
+  static int theme_pos = 0;
 
 
   // Put the pointers to the NUM_MIXER_BUFFERS mixer_buffers in the PM_to_mixer queue
@@ -160,6 +159,15 @@ static void effect_mixer_task(void *params)
           }
         }
       }
+      
+      // Add theme
+      // for(int i=0; i<EFFECT_BUFFER_SIZE; i++){
+      //   buffer[i] += (uint16_t)theme[theme_pos].data[i];
+      // }
+      // theme_pos++;
+      // if(theme_pos >= NUM_theme_BUFFERS)
+      //   theme_pos = 0;
+
       for(int i=0; i<EFFECT_BUFFER_SIZE; i++){
         buffer[i] += 512;
       }
@@ -235,7 +243,7 @@ static uint16_t *ISRToMixerqueue_buf[NUM_MIXER_BUFFERS];
 
 // }
 
-// sendqueu stuffs
+// sendqueue stuffs
 static StaticQueue_t effectTaskqueue_QCB[NUM_EFFECTS];
 static uint16_t *EffectTaskqueue_buf[NUM_EFFECTS][NUM_MIXER_BUFFERS];
 
